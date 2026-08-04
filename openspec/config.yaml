@@ -1,20 +1,35 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+# Project Context for OpenSpec & AI Assistants
+context: |
+  Project: PromptVerse — Marketplace de Prompts IA (ChatGPT, Midjourney, DALL-E, Claude, etc.)
+  Certification: Titre Professionnel CDA (Concepteur Développeur d'Applications - RNCP 37873) — Project Solo
+  
+  Tech Stack:
+    - Backend: NestJS (TypeScript), TypeORM, MySQL 8.0
+    - Auth: Custom JWT + bcrypt (Natif NestJS, sans Passport, sans OAuth)
+    - Cache & Performance: Redis (TTL 5 min sur le catalogue)
+    - Storage: S3 / MinIO (Stockage des images PreviewImage)
+    - Payments: Stripe Checkout (Achats) + Stripe Connect (Versements Payouts)
+    - Mails: Nodemailer / Mailpit (Dev) / Brevo (Prod)
+    - Frontend: React (TypeScript) + Vite + Tailwind CSS (Dark Mode)
+    - Infra & DevOps: Docker, Docker Compose, Nginx (Reverse Proxy), GitHub Actions (CI/CD)
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+  Architecture & Domain Rules:
+    - 3 Roles: USER (Achète ET Vend des prompts), ADMIN (Gestion & Modération), SUPER_ADMIN (Administration Système).
+    - Publication Directe: Les prompts créés par un USER passent immédiatement au statut 'PUBLISHED' (ou 'ARCHIVED'). Pas de statut DRAFT ni PENDING.
+    - Confidentialité du Contenu: Le champ 'promptContent' est masqué et accessible UNIQUEMENT après validation d'une commande au statut 'PAID'.
+    - Base de Données Normalisée:
+      * User (Auth & Identifiants) <1:1> UserProfile (Avatar & Bio) <1:N> SocialLink (Réseaux Sociaux Dynamiques).
+      * Prompts (Produits) avec coverImage, salesCount, viewsCount, favoritesCount, averageRating (Decimal 2,1).
+      * OrderItem historise promptTitle, sellerId et priceAtPurchase au moment exact de l'achat.
+      * Contraintes d'Unicité UNIQUE(user_id, prompt_id) sur CartItems, WishlistItems et Reviews.
+
+rules:
+  proposal:
+    - "Focus on Spec-Driven Development: clear goals, scope, and non-goals."
+    - "Always keep security (OWASP) and JWT RBAC permissions in mind."
+  specs:
+    - "Write functional requirements with Given-When-Then (Gherkin) acceptance criteria."
+  tasks:
+    - "Break implementation into small, testable chunks (module by module)."
