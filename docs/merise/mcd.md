@@ -31,6 +31,7 @@ erDiagram
         string id PK
         string avatar
         text bio
+        datetime created_at
         datetime updated_at
     }
 
