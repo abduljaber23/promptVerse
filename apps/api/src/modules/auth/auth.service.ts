@@ -1,8 +1,10 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { BcryptService } from './bcrypt.service';
@@ -12,6 +14,9 @@ import { MailService } from '../mail/mail.service';
 import { ErrorCodes } from '../../common/errors/error-codes';
 import { randomBytes } from 'crypto';
 import { ConfigService } from '@nestjs/config';
+import { LoginDto } from './dto/login.dto';
+import { jwtPayloadType } from '../../common/enums/user.enum';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -60,6 +65,62 @@ export class AuthService {
     };
   }
 
+  async login(loginDto: LoginDto) {
+    const { email, password } = loginDto;
+    const emailLowercase = email.toLowerCase().trim();
+    const user = await this.usersService.findByEmail(emailLowercase);
+    if (!user) {
+      throw new UnauthorizedException({
+        code: ErrorCodes.INVALID_CREDENTIALS,
+      });
+    }
+
+    const isPasswordValid = await this.bcryptService.compare(
+      password,
+      user.password,
+    );
+    if (!isPasswordValid) {
+      throw new UnauthorizedException({
+        code: ErrorCodes.INVALID_CREDENTIALS,
+      });
+    }
+
+    if (!user.isEmailVerified) {
+      const isTokenValid =
+        user.verificationToken &&
+        user.verificationTokenExpiresAt &&
+        user.verificationTokenExpiresAt > new Date();
+
+      if (!isTokenValid) {
+        user.verificationToken = randomBytes(32).toString('hex');
+        user.verificationTokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
+        await this.usersService.save(user);
+
+        const link = this.generateVerificationLink(
+          user.id,
+          user.verificationToken,
+        );
+        await this.mailService.sendVerifyEmailTemplate(emailLowercase, link);
+
+        throw new ForbiddenException({
+          code: ErrorCodes.EMAIL_VERIFICATION_SENT,
+        });
+      }
+
+      throw new ForbiddenException({
+        code: ErrorCodes.EMAIL_NOT_VERIFIED,
+      });
+    }
+    await this.usersService.updateLastLogin(user.id);
+    const accessToken = await this.generateAccessToken({
+      sub: user.id,
+      role: user.role,
+    });
+    return {
+      accessToken,
+    };
+  }
+
   async verifyEmail(userId: string, verificationToken: string) {
     const user = await this.usersService.currentUser(userId);
 
@@ -92,11 +153,90 @@ export class AuthService {
     return { message: 'Your email has been verified' };
   }
 
+  async sendResetPasswordLink(email: string) {
+    const user = await this.usersService.findByEmail(email);
+    if (!user)
+      throw new BadRequestException({
+        code: ErrorCodes.USER_NOT_FOUND,
+      });
+    user.resetPasswordToken = randomBytes(32).toString('hex');
+    user.resetPasswordTokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
+    const result = await this.usersService.save(user);
+    const resetPasswordLink = `${this.config.getOrThrow<string>('CLIENT_URL')}/reset-password/${user.id}/${result.resetPasswordToken}`;
+
+    await this.mailService.sendResetPasswordTemplate(email, resetPasswordLink);
+
+    return {
+      message:
+        'A password reset link has been sent to your email. Please check your inbox.',
+    };
+  }
+
+  async getResetPasswordLink(userId: string, resetPasswordToken: string) {
+    const user = await this.usersService.findById(userId);
+    if (!user)
+      throw new BadRequestException({
+        code: ErrorCodes.INVALID_LINK,
+      });
+    if (
+      user.resetPasswordToken === null ||
+      user.resetPasswordToken !== resetPasswordToken
+    )
+      throw new BadRequestException({
+        code: ErrorCodes.INVALID_LINK,
+      });
+
+    if (
+      user.resetPasswordTokenExpiresAt &&
+      user.resetPasswordTokenExpiresAt < new Date()
+    )
+      throw new BadRequestException({
+        code: ErrorCodes.TOKEN_EXPIRED,
+      });
+
+    return { message: 'Valid link' };
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    const { userId, resetPasswordToken, newPassword } = dto;
+
+    const user = await this.usersService.findById(userId);
+    if (!user)
+      throw new BadRequestException({
+        code: ErrorCodes.INVALID_LINK,
+      });
+    if (
+      user.resetPasswordToken === null ||
+      user.resetPasswordToken !== resetPasswordToken
+    )
+      throw new BadRequestException({
+        code: ErrorCodes.INVALID_LINK,
+      });
+
+    if (
+      user.resetPasswordTokenExpiresAt &&
+      user.resetPasswordTokenExpiresAt < new Date()
+    )
+      throw new BadRequestException({
+        code: ErrorCodes.TOKEN_EXPIRED,
+      });
+
+    const hashedPassword = await this.bcryptService.hash(newPassword);
+    user.password = hashedPassword;
+    user.resetPasswordToken = null;
+    await this.usersService.save(user);
+    return { message: 'Password reset successfully. Please login.' };
+  }
+
   private generateVerificationLink(
     userId: string,
     verificationToken: string,
   ): string {
     const clientUrl = this.config.getOrThrow<string>('APP_URL');
     return `${clientUrl}/api/v1/auth/verify-email/${userId}/${verificationToken}`;
+  }
+
+  private generateAccessToken(payload: jwtPayloadType): Promise<string> {
+    return this.jwtService.signAsync(payload);
   }
 }

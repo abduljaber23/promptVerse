@@ -41,4 +41,10 @@ export class UsersService {
       });
     return user;
   }
+
+  async updateLastLogin(id: string): Promise<void> {
+    await this.usersRepository.update(id, {
+      lastLoginAt: new Date(),
+    });
+  }
 }

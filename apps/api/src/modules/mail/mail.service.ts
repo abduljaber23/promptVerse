@@ -31,4 +31,24 @@ export class MailService {
       });
     }
   }
+
+  async sendResetPasswordTemplate(email: string, link: string) {
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: 'Reset your password',
+        template: 'reset-password',
+        context: { link },
+      });
+    } catch (e) {
+      const error = e as Error;
+      this.logger.error(
+        `Error sending reset password email: ${error.message}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException({
+        code: ErrorCodes.EMAIL_SEND_FAILED,
+      });
+    }
+  }
 }
