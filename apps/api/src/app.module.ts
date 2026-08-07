@@ -13,6 +13,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { JwtModule, JwtSignOptions } from '@nestjs/jwt';
 
 import { StorageModule } from './modules/storage/storage.module';
+import { HealthModule } from './modules/health/health.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { StorageModule } from './modules/storage/storage.module';
         limit: 2000,
       },
     ]),
+    HealthModule,
     UsersModule,
     AuthModule,
     MailModule,
