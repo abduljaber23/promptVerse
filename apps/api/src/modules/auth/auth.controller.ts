@@ -14,6 +14,9 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { Throttle } from '@nestjs/throttler';
+import { Public } from '../../common/decorators/public.decorator';
+import { ApiSecurity } from '@nestjs/swagger';
 
 @Controller({
   path: 'auth',
@@ -23,12 +26,32 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @Throttle({
+    short: { limit: 2, ttl: 1000 },
+    medium: {
+      limit: 10,
+      ttl: 60000,
+      blockDuration: 10 * 60 * 1000,
+    },
+    long: { limit: 30, ttl: 3600000 },
+  })
+  @Public()
   @HttpCode(HttpStatus.CREATED)
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
 
   @Post('login')
+  @Throttle({
+    short: { limit: 2, ttl: 1000 },
+    medium: {
+      limit: 5,
+      ttl: 60000,
+      blockDuration: 15 * 60 * 1000,
+    },
+    long: { limit: 20, ttl: 3600000 },
+  })
+  @Public()
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() loginDto: LoginDto,
@@ -48,6 +71,7 @@ export class AuthController {
     };
   }
 
+  @ApiSecurity('access_token')
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   logout(@Res({ passthrough: true }) res: Response) {
@@ -62,6 +86,7 @@ export class AuthController {
     };
   }
 
+  @Public()
   @Get('verify-email/:id/:verificationToken')
   async verifyEmail(
     @Param('id') id: string,
@@ -70,12 +95,14 @@ export class AuthController {
     return this.authService.verifyEmail(id, verificationToken);
   }
 
-   @Post('forgot-password')
+  @Public()
+  @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
   forgetPassword(@Body() body: ForgotPasswordDto) {
     return this.authService.sendResetPasswordLink(body.email);
   }
 
+  @Public()
   @Get('reset-password/:id/:resetPasswordToken')
   async getResetPassword(
     @Param('id') id: string,
@@ -84,6 +111,7 @@ export class AuthController {
     return this.authService.getResetPasswordLink(id, resetPasswordToken);
   }
 
+  @Public()
   @Post('reset-password')
   async resetPassword(@Body() body: ResetPasswordDto) {
     return this.authService.resetPassword(body);

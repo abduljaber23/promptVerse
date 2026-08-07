@@ -1,11 +1,16 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ClassSerializerInterceptor, Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { envValidationSchema } from './common/config/env.validation';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { dataSourceOptions } from './database/data-source';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { MailModule } from './modules/mail/mail.module';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { AuthGuard } from './common/guards/auth.guard';
+import { CustomThrottlerGuard } from './common/guards/custom-throttler.guard';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { JwtModule, JwtSignOptions } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -17,10 +22,55 @@ import { MailModule } from './modules/mail/mail.module';
         abortEarly: false,
       },
     }),
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        return {
+          global: true,
+          secret: config.get<string>('JWT_SECRET'),
+          signOptions: {
+            expiresIn: config.get<string>(
+              'JWT_EXPIRES_IN',
+            ) as JwtSignOptions['expiresIn'],
+          },
+        };
+      },
+    }),
     TypeOrmModule.forRoot(dataSourceOptions),
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 1000,
+        limit: 5,
+      },
+      {
+        name: 'medium',
+        ttl: 60000,
+        limit: 120,
+      },
+      {
+        name: 'long',
+        ttl: 3600000,
+        limit: 2000,
+      },
+    ]),
     UsersModule,
     AuthModule,
     MailModule,
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: CustomThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}
