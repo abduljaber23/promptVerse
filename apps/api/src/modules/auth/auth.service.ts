@@ -224,6 +224,7 @@ export class AuthService {
     const hashedPassword = await this.bcryptService.hash(newPassword);
     user.password = hashedPassword;
     user.resetPasswordToken = null;
+    user.resetPasswordTokenExpiresAt = null;
     await this.usersService.save(user);
     return { message: 'Password reset successfully. Please login.' };
   }
@@ -232,7 +233,7 @@ export class AuthService {
     userId: string,
     verificationToken: string,
   ): string {
-    const clientUrl = this.config.getOrThrow<string>('APP_URL');
+    const clientUrl = this.config.getOrThrow<string>('CLIENT_URL');
     return `${clientUrl}/api/v1/auth/verify-email/${userId}/${verificationToken}`;
   }
 

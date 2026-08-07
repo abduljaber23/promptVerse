@@ -12,6 +12,8 @@ import { CustomThrottlerGuard } from './common/guards/custom-throttler.guard';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { JwtModule, JwtSignOptions } from '@nestjs/jwt';
 
+import { StorageModule } from './modules/storage/storage.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -57,6 +59,7 @@ import { JwtModule, JwtSignOptions } from '@nestjs/jwt';
     UsersModule,
     AuthModule,
     MailModule,
+    StorageModule,
   ],
   providers: [
     {

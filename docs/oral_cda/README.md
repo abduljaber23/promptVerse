@@ -9,6 +9,7 @@ Ce dossier contient votre kit de révision complet pour défendre le projet **Pr
 * 📖 **[vocabulaire_cda.md](file:///c:/FormationCDA/projet_final/PromptVerse/docs/oral_cda/vocabulaire_cda.md)** — *Dictionnaire des 20 mots techniques indispensables (définition simple + exemple exact dans votre code).*
 * 📄 **[auth.md](file:///c:/FormationCDA/projet_final/PromptVerse/docs/oral_cda/auth.md)** — *Module Authentification & Sécurité (`register`, `verifyEmail`, `BcryptService`, sanitization, tokens, codes HTTP).*
 * 📄 **[users.md](file:///c:/FormationCDA/projet_final/PromptVerse/docs/oral_cda/users.md)** — *Module Utilisateurs & Entités (`UsersService`, entités `User`/`UserProfile`/`SocialLink`, UUIDs, Soft Delete, `@Exclude()`).*
+* 📄 **[storage.md](file:///c:/FormationCDA/projet_final/PromptVerse/docs/oral_cda/storage.md)** — *Module Stockage Fichiers S3/MinIO (`StorageService`, `S3Client`, `forcePathStyle`, upload avatars/media, gestion `NoSuchKey`).*
 * 📄 **[mail.md](file:///c:/FormationCDA/projet_final/PromptVerse/docs/oral_cda/mail.md)** — *Module Email (`MailService`, templates Handlebars, Logger NestJS, gestion d'erreurs SMTP).*
 
 ---

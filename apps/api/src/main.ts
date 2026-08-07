@@ -68,4 +68,4 @@ async function bootstrap() {
   logger.log(`Environment: ${nodeEnv}`);
   logger.log(`Api docs: ${appUrl}/${apiPrefix}/docs`);
 }
-bootstrap();
+void bootstrap();
