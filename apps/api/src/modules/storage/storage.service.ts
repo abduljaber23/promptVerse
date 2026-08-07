@@ -13,7 +13,7 @@ import {
   GetObjectCommand,
 } from '@aws-sdk/client-s3';
 import { randomUUID } from 'crypto';
-import { extname } from 'path';
+import { extname, parse } from 'path';
 import 'multer';
 
 @Injectable()
@@ -43,8 +43,18 @@ export class StorageService {
   ): Promise<string> {
     try {
       const fileExtName = extname(file.originalname);
-      const randomName = randomUUID().replace(/-/g, '').slice(0, 16);
-      const key = `${folder}/${randomName}${fileExtName}`;
+      const originalNameWithoutExt = parse(file.originalname).name;
+
+      // Nettoyage du nom d'origine (minuscules, suppression des caractères spéciaux et espaces)
+      const sanitizedOriginalName =
+        originalNameWithoutExt
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '') || 'file';
+
+      const randomName = randomUUID().replace(/-/g, '').slice(0, 8);
+      const key = `${folder}/${sanitizedOriginalName}-${randomName}${fileExtName}`;
 
       const command = new PutObjectCommand({
         Bucket: this.bucket,
