@@ -1,9 +1,11 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Res,
   UploadedFile,
@@ -20,6 +22,7 @@ import { Public } from '../../common/decorators/public.decorator';
 import { ErrorCodes } from '../../common/errors/error-codes';
 import { AvatarUploadDto } from './dto/avatar-upload.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiSecurity('access_token')
 @Controller({
@@ -35,6 +38,19 @@ export class UsersController {
   @Get('me')
   me(@CurrentUser() payload: jwtPayloadType) {
     return this.usersService.currentUser(payload.sub);
+  }
+
+  @Patch('me')
+  update(
+    @CurrentUser() payload: jwtPayloadType,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.usersService.update(updateUserDto, payload.sub);
+  }
+
+  @Delete('me')
+  delete(@CurrentUser() payload: jwtPayloadType) {
+    return this.usersService.delete(payload.sub);
   }
 
   @Post('avatar')

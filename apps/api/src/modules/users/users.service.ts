@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -10,6 +11,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ErrorCodes } from '../../common/errors/error-codes';
 import { StorageService } from '../storage/storage.service';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { ConfigService } from '@nestjs/config';
+import { randomBytes } from 'crypto';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class UsersService {
@@ -17,6 +22,8 @@ export class UsersService {
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
     private readonly storageService: StorageService,
+    private readonly config: ConfigService,
+    private readonly mailService: MailService,
   ) {}
 
   findById(id: string): Promise<User | null> {
@@ -67,6 +74,70 @@ export class UsersService {
     });
   }
 
+  async update(updateUserDto: UpdateUserDto, userId: string) {
+    const user = await this.currentUser(userId);
+    let message = 'Profile updated successfully';
+
+    if (
+      updateUserDto.email &&
+      updateUserDto.email.toLowerCase().trim() !== user.email
+    ) {
+      const emailLowercase = updateUserDto.email.toLowerCase().trim();
+      const emailExists = await this.findByEmail(emailLowercase);
+      if (emailExists && emailExists.id !== user.id) {
+        throw new ConflictException({
+          code: ErrorCodes.EMAIL_ALREADY_EXISTS,
+        });
+      }
+      updateUserDto.email = emailLowercase;
+      user.isEmailVerified = false;
+      user.verificationToken = randomBytes(32).toString('hex');
+      user.verificationTokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+      const link = this.generateVerificationLink(
+        user.id,
+        user.verificationToken,
+      );
+      await this.mailService.sendVerifyEmailTemplate(emailLowercase, link);
+
+      message = 'A verification link has been sent to your new email address.';
+    }
+
+    if (
+      updateUserDto.username &&
+      updateUserDto.username.trim() !== user.username
+    ) {
+      const usernameTrimmed = updateUserDto.username.trim();
+      const usernameExists = await this.findByUsername(usernameTrimmed);
+      if (usernameExists && usernameExists.id !== user.id) {
+        throw new ConflictException({
+          code: ErrorCodes.USERNAME_ALREADY_IN_USE,
+        });
+      }
+      updateUserDto.username = usernameTrimmed;
+    }
+
+    if (updateUserDto.bio !== undefined) {
+      if (!user.profile) {
+        user.profile = new UserProfile();
+      }
+      user.profile.bio = updateUserDto.bio;
+    }
+
+    Object.assign(user, {
+      username: updateUserDto.username,
+      email: updateUserDto.email,
+    });
+    const updatedUser = await this.usersRepository.save(user);
+
+    return { user: updatedUser.id, message };
+  }
+
+  async delete(userId: string): Promise<void> {
+    const user = await this.currentUser(userId);
+    await this.usersRepository.softRemove(user);
+  }
+
   async setProfileAvatar(userId: string, file: Express.Multer.File) {
     const user = await this.currentUser(userId);
     const key = await this.storageService.uploadFile(file, 'avatars');
@@ -96,5 +167,13 @@ export class UsersService {
 
     user.profile.avatar = null;
     return await this.usersRepository.save(user);
+  }
+
+  private generateVerificationLink(
+    userId: string,
+    verificationToken: string,
+  ): string {
+    const clientUrl = this.config.getOrThrow<string>('CLIENT_URL');
+    return `${clientUrl}/api/v1/auth/verify-email/${userId}/${verificationToken}`;
   }
 }

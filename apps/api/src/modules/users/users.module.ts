@@ -6,10 +6,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { StorageModule } from '../storage/storage.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { ErrorCodes } from '../../common/errors/error-codes';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
+    MailModule,
     StorageModule,
     MulterModule.register({
       fileFilter: (req, file, cb) => {
