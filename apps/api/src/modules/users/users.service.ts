@@ -59,13 +59,18 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  async currentUser(id: string) {
+  private async findByIdOrFail(id: string): Promise<User> {
     const user = await this.findById(id);
     if (!user)
       throw new NotFoundException({
         code: ErrorCodes.USER_NOT_FOUND,
       });
     return user;
+  }
+
+  async currentUser(id: string) {
+    const user = await this.findByIdOrFail(id);
+    return this.safeUserResponse(user);
   }
 
   async updateLastLogin(id: string): Promise<void> {
@@ -75,7 +80,7 @@ export class UsersService {
   }
 
   async update(updateUserDto: UpdateUserDto, userId: string) {
-    const user = await this.currentUser(userId);
+    const user = await this.findByIdOrFail(userId);
     let message = 'Profile updated successfully';
 
     if (
@@ -130,16 +135,16 @@ export class UsersService {
     });
     const updatedUser = await this.usersRepository.save(user);
 
-    return { user: updatedUser.id, message };
+    return { user: this.safeUserResponse(updatedUser), message };
   }
 
   async delete(userId: string): Promise<void> {
-    const user = await this.currentUser(userId);
+    const user = await this.findByIdOrFail(userId);
     await this.usersRepository.softRemove(user);
   }
 
   async setProfileAvatar(userId: string, file: Express.Multer.File) {
-    const user = await this.currentUser(userId);
+    const user = await this.findByIdOrFail(userId);
     const key = await this.storageService.uploadFile(file, 'avatars');
     const newProfileAvatar = key.split('/')[1];
 
@@ -152,11 +157,12 @@ export class UsersService {
     }
 
     user.profile.avatar = newProfileAvatar;
-    return await this.usersRepository.save(user);
+    const savedUser = await this.usersRepository.save(user);
+    return this.safeUserResponse(savedUser);
   }
 
   async removeProfileAvatar(userId: string) {
-    const user = await this.currentUser(userId);
+    const user = await this.findByIdOrFail(userId);
     if (!user.profile || !user.profile.avatar) {
       throw new BadRequestException({
         code: ErrorCodes.NO_PROFILE_AVATAR,
@@ -166,7 +172,8 @@ export class UsersService {
     await this.storageService.deleteFile(`avatars/${user.profile.avatar}`);
 
     user.profile.avatar = null;
-    return await this.usersRepository.save(user);
+    const savedUser = await this.usersRepository.save(user);
+    return this.safeUserResponse(savedUser);
   }
 
   private generateVerificationLink(
@@ -175,5 +182,23 @@ export class UsersService {
   ): string {
     const clientUrl = this.config.getOrThrow<string>('CLIENT_URL');
     return `${clientUrl}/api/v1/auth/verify-email/${userId}/${verificationToken}`;
+  }
+
+  private safeUserResponse(user: User) {
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      isEmailVerified: user.isEmailVerified,
+      lastLoginAt: user.lastLoginAt,
+      profile: user.profile
+        ? {
+            avatar: user.profile.avatar,
+            bio: user.profile.bio,
+          }
+        : null,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
   }
 }

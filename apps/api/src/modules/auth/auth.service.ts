@@ -122,7 +122,11 @@ export class AuthService {
   }
 
   async verifyEmail(userId: string, verificationToken: string) {
-    const user = await this.usersService.currentUser(userId);
+    const user = await this.usersService.findById(userId);
+    if (!user)
+      throw new NotFoundException({
+        code: ErrorCodes.VERIFICATION_TOKEN_NOT_FOUND,
+      });
 
     if (user.isEmailVerified) {
       return { message: 'Your email has already been verified successfully.' };

@@ -23,7 +23,9 @@ import { ErrorCodes } from '../../common/errors/error-codes';
 import { AvatarUploadDto } from './dto/avatar-upload.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
+@UseInterceptors(CacheInterceptor)
 @ApiSecurity('access_token')
 @Controller({
   path: 'users',
