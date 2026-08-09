@@ -5,7 +5,9 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Prompt } from '../../prompts/entities/prompt.entity';
 
 @Entity('ai_tools')
 export class AiTool {
@@ -29,4 +31,7 @@ export class AiTool {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Prompt, (prompt) => prompt.aiTool)
+  prompts: Prompt[];
 }

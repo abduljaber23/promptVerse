@@ -5,7 +5,9 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Prompt } from '../../prompts/entities/prompt.entity';
 
 @Entity('categories')
 export class Category {
@@ -29,4 +31,7 @@ export class Category {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Prompt, (prompt) => prompt.category)
+  prompts: Prompt[];
 }

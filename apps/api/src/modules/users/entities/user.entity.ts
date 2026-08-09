@@ -6,11 +6,14 @@ import {
   Entity,
   Index,
   OneToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRoles, UserStatus } from '../../../common/enums/user.enum';
 import { UserProfile } from './user-profile.entity';
+import { Prompt } from '../../prompts/entities/prompt.entity';
+
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -85,4 +88,7 @@ export class User {
 
   @OneToOne(() => UserProfile, (profile) => profile.user, { cascade: true })
   profile: UserProfile;
+
+  @OneToMany(() => Prompt, (prompt) => prompt.seller)
+  prompts: Prompt[];
 }
