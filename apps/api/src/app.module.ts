@@ -15,6 +15,7 @@ import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import { createKeyv } from '@keyv/redis';
 import { StorageModule } from './modules/storage/storage.module';
 import { HealthModule } from './modules/health/health.module';
+import { AiToolsModule } from './modules/ai-tools/ai-tools.module';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { HealthModule } from './modules/health/health.module';
     AuthModule,
     MailModule,
     StorageModule,
+    AiToolsModule,
   ],
   providers: [
     {

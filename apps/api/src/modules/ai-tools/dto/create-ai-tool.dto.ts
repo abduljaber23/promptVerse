@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator/types/decorator/typechecker/IsString';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateAiToolDto {
   @ApiProperty({
@@ -7,5 +7,6 @@ export class CreateAiToolDto {
     example: 'ChatGPT',
   })
   @IsString()
+  @IsNotEmpty()
   name: string;
 }
