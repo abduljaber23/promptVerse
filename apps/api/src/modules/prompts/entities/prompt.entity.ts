@@ -80,7 +80,9 @@ export class Prompt {
   @Column({ type: 'uuid' })
   categoryId: string;
 
-  @ManyToOne(() => Category, (category) => category.prompts, { onDelete: 'RESTRICT' })
+  @ManyToOne(() => Category, (category) => category.prompts, {
+    onDelete: 'RESTRICT',
+  })
   @JoinColumn({ name: 'categoryId' })
   category: Category;
 
@@ -91,6 +93,8 @@ export class Prompt {
   @JoinColumn({ name: 'aiToolId' })
   aiTool: AiTool;
 
-  @OneToMany(() => PreviewImage, (previewImage) => previewImage.prompt, { cascade: true })
+  @OneToMany(() => PreviewImage, (previewImage) => previewImage.prompt, {
+    cascade: true,
+  })
   previewImages: PreviewImage[];
 }

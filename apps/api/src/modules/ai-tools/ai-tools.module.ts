@@ -8,5 +8,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [TypeOrmModule.forFeature([AiTool])],
   controllers: [AiToolsController],
   providers: [AiToolsService],
+  exports: [AiToolsService],
 })
 export class AiToolsModule {}

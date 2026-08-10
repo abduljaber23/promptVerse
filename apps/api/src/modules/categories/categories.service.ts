@@ -61,6 +61,10 @@ export class CategoriesService {
     });
   }
 
+  findBySlug(slug: string) {
+    return this.categoriesRepository.findOne({ where: { slug } });
+  }
+
   async findOneBySlug(slug: string) {
     const normalizedSlug = slug.trim().toLowerCase();
     const category = await this.categoriesRepository.findOne({

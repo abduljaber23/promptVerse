@@ -13,8 +13,9 @@ import {
   GetObjectCommand,
 } from '@aws-sdk/client-s3';
 import { randomUUID } from 'crypto';
-import { extname, parse } from 'path';
+import { extname } from 'path';
 import 'multer';
+import { StorageFolder } from '../../common/enums/storage-folder.enum';
 
 @Injectable()
 export class StorageService {
@@ -39,22 +40,11 @@ export class StorageService {
 
   async uploadFile(
     file: Express.Multer.File,
-    folder: 'avatars' | 'media',
+    folder: StorageFolder,
   ): Promise<string> {
     try {
       const fileExtName = extname(file.originalname);
-      const originalNameWithoutExt = parse(file.originalname).name;
-
-      // Nettoyage du nom d'origine (minuscules, suppression des caractères spéciaux et espaces)
-      const sanitizedOriginalName =
-        originalNameWithoutExt
-          .toLowerCase()
-          .replace(/[^a-z0-9]/g, '-')
-          .replace(/-+/g, '-')
-          .replace(/^-|-$/g, '') || 'file';
-
-      const randomName = randomUUID().replace(/-/g, '').slice(0, 8);
-      const key = `${folder}/${sanitizedOriginalName}-${randomName}${fileExtName}`;
+      const key = `${folder}/${randomUUID()}${fileExtName}`;
 
       const command = new PutObjectCommand({
         Bucket: this.bucket,

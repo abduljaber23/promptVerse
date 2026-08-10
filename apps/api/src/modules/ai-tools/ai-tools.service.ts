@@ -61,6 +61,10 @@ export class AiToolsService {
     });
   }
 
+  findBySlug(slug: string) {
+    return this.aiToolsRepository.findOne({ where: { slug } });
+  }
+
   async findOneBySlug(slug: string) {
     const normalizedSlug = slug.trim().toLowerCase();
     const aiTool = await this.aiToolsRepository.findOne({

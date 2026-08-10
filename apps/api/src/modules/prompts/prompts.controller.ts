@@ -36,4 +36,16 @@ export class PromptsController {
   findOneBySlug(@Param('slug') slug: string) {
     return this.promptsService.findOneBySlug(slug);
   }
+
+  @Get('category/:categorySlug')
+  @Public()
+  findAllByCategory(@Param('categorySlug') categorySlug: string) {
+    return this.promptsService.findAllByCategory(categorySlug);
+  }
+
+  @Get('ai-tool/:aiToolSlug')
+  @Public()
+  findAllByAiTool(@Param('aiToolSlug') aiToolSlug: string) {
+    return this.promptsService.findAllByAiTool(aiToolSlug);
+  }
 }

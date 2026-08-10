@@ -15,6 +15,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ConfigService } from '@nestjs/config';
 import { randomBytes } from 'crypto';
 import { MailService } from '../mail/mail.service';
+import { StorageFolder } from '../../common/enums/storage-folder.enum';
 
 @Injectable()
 export class UsersService {
@@ -145,34 +146,42 @@ export class UsersService {
 
   async setProfileAvatar(userId: string, file: Express.Multer.File) {
     const user = await this.findByIdOrFail(userId);
-    const key = await this.storageService.uploadFile(file, 'avatars');
-    const newProfileAvatar = key.split('/')[1];
+
+    const key = await this.storageService.uploadFile(
+      file,
+      StorageFolder.AVATARS,
+    );
 
     if (!user.profile) {
       user.profile = new UserProfile();
     }
 
     if (user.profile.avatar) {
-      await this.storageService.deleteFile(`avatars/${user.profile.avatar}`);
+      await this.storageService.deleteFile(user.profile.avatar);
     }
 
-    user.profile.avatar = newProfileAvatar;
+    user.profile.avatar = key;
+
     const savedUser = await this.usersRepository.save(user);
+
     return this.safeUserResponse(savedUser);
   }
 
   async removeProfileAvatar(userId: string) {
     const user = await this.findByIdOrFail(userId);
-    if (!user.profile || !user.profile.avatar) {
+
+    if (!user.profile?.avatar) {
       throw new BadRequestException({
         code: ErrorCodes.NO_PROFILE_AVATAR,
       });
     }
 
-    await this.storageService.deleteFile(`avatars/${user.profile.avatar}`);
+    await this.storageService.deleteFile(user.profile.avatar);
 
     user.profile.avatar = null;
+
     const savedUser = await this.usersRepository.save(user);
+
     return this.safeUserResponse(savedUser);
   }
 

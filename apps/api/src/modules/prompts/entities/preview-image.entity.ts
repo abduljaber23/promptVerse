@@ -1,4 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Prompt } from './prompt.entity';
 
 @Entity('preview_images')
@@ -15,7 +21,9 @@ export class PreviewImage {
   @Column({ type: 'uuid' })
   promptId: string;
 
-  @ManyToOne(() => Prompt, (prompt) => prompt.previewImages, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Prompt, (prompt) => prompt.previewImages, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'promptId' })
   prompt: Prompt;
 }
