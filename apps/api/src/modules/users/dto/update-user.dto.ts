@@ -28,8 +28,8 @@ export class UpdateUserDto {
   email?: string;
 
   @ApiProperty({
-    description: 'The email of the user',
-    example: 'abduljaber@gmail.com',
+    description: 'The bio of the user',
+    example: 'I am a passionate developer with a love for creating innovative solutions. I enjoy working on challenging projects and continuously learning new technologies.',
   })
   @IsNotEmpty()
   @IsString()

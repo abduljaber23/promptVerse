@@ -158,11 +158,16 @@ export class AuthService {
   }
 
   async sendResetPasswordLink(email: string) {
+    const neutralResponse = {
+      message:
+        'If an account with this email exists, a password reset link has been sent. Please check your inbox.',
+    };
+
     const user = await this.usersService.findByEmail(email);
-    if (!user)
-      throw new BadRequestException({
-        code: ErrorCodes.USER_NOT_FOUND,
-      });
+    if (!user) {
+      return neutralResponse;
+    }
+
     user.resetPasswordToken = randomBytes(32).toString('hex');
     user.resetPasswordTokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
     const result = await this.usersService.save(user);
@@ -170,10 +175,7 @@ export class AuthService {
 
     await this.mailService.sendResetPasswordTemplate(email, resetPasswordLink);
 
-    return {
-      message:
-        'A password reset link has been sent to your email. Please check your inbox.',
-    };
+    return neutralResponse;
   }
 
   async getResetPasswordLink(userId: string, resetPasswordToken: string) {

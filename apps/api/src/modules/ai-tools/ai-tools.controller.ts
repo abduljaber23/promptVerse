@@ -16,13 +16,16 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoles } from '../../common/enums/user.enum';
 import { Public } from '../../common/decorators/public.decorator';
 
-@Controller('ai-tools')
+@Controller({
+  path: 'ai-tools',
+  version: '1',
+})
 export class AiToolsController {
   constructor(private readonly aiToolsService: AiToolsService) {}
 
   @Post()
   @UseGuards(AuthRolesGuard)
-  @Roles(UserRoles.ADMIN, UserRoles.SUPER_ADMIN, UserRoles.USER)
+  @Roles(UserRoles.ADMIN, UserRoles.SUPER_ADMIN)
   create(@Body() createAiToolDto: CreateAiToolDto) {
     return this.aiToolsService.create(createAiToolDto);
   }

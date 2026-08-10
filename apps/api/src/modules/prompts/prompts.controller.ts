@@ -18,7 +18,10 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { CreatePromptDto } from './dto/create-prompt.dto';
 
-@Controller('prompts')
+@Controller({
+  path: 'prompts',
+  version: '1',
+})
 export class PromptsController {
   constructor(private readonly promptsService: PromptsService) {}
 

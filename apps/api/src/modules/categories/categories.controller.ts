@@ -16,13 +16,16 @@ import { UserRoles } from '../../common/enums/user.enum';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 
-@Controller('categories')
+@Controller({
+  path: 'categories',
+  version: '1',
+})
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Post()
   @UseGuards(AuthRolesGuard)
-  @Roles(UserRoles.ADMIN, UserRoles.SUPER_ADMIN, UserRoles.USER)
+  @Roles(UserRoles.ADMIN, UserRoles.SUPER_ADMIN)
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoriesService.create(createCategoryDto);
   }
