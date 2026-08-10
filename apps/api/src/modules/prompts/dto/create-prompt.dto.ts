@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  Allow,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -64,4 +65,25 @@ export class CreatePromptDto {
   @IsUUID()
   @IsNotEmpty()
   aiToolId: string;
+
+  @ApiPropertyOptional({
+    type: 'string',
+    format: 'binary',
+    required: false,
+    name: 'coverImage',
+  })
+  @Allow()
+  coverImage?: Express.Multer.File;
+
+  @ApiPropertyOptional({
+    type: 'array',
+    items: {
+      type: 'string',
+      format: 'binary',
+    },
+    required: false,
+    name: 'previewImages',
+  })
+  @Allow()
+  previewImages?: Express.Multer.File[];
 }

@@ -61,6 +61,10 @@ export class AiToolsService {
     });
   }
 
+  findById(id: string) {
+    return this.aiToolsRepository.findOne({ where: { id } });
+  }
+
   findBySlug(slug: string) {
     return this.aiToolsRepository.findOne({ where: { slug } });
   }

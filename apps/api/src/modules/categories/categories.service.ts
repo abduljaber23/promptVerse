@@ -61,6 +61,10 @@ export class CategoriesService {
     });
   }
 
+  findById(id: string) {
+    return this.categoriesRepository.findOne({ where: { id } });
+  }
+
   findBySlug(slug: string) {
     return this.categoriesRepository.findOne({ where: { slug } });
   }
