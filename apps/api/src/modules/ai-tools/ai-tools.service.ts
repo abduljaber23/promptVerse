@@ -62,7 +62,7 @@ export class AiToolsService {
   }
 
   async findOneBySlug(slug: string) {
-    const normalizedSlug = slug.trim().toLocaleLowerCase();
+    const normalizedSlug = slug.trim().toLowerCase();
     const aiTool = await this.aiToolsRepository.findOne({
       where: { slug: normalizedSlug },
     });

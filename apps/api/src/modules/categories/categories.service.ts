@@ -62,7 +62,7 @@ export class CategoriesService {
   }
 
   async findOneBySlug(slug: string) {
-    const normalizedSlug = slug.trim().toLocaleLowerCase();
+    const normalizedSlug = slug.trim().toLowerCase();
     const category = await this.categoriesRepository.findOne({
       where: { slug: normalizedSlug },
     });

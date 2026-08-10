@@ -17,6 +17,7 @@ import { StorageModule } from './modules/storage/storage.module';
 import { HealthModule } from './modules/health/health.module';
 import { AiToolsModule } from './modules/ai-tools/ai-tools.module';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { PromptsModule } from './modules/prompts/prompts.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
     StorageModule,
     AiToolsModule,
     CategoriesModule,
+    PromptsModule,
   ],
   providers: [
     {
