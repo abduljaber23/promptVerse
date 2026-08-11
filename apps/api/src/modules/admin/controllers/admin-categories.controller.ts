@@ -8,12 +8,12 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { CategoriesService } from '../categories/categories.service';
-import { AuthRolesGuard } from '../../common/guards/auth-roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { UserRoles } from '../../common/enums/user.enum';
-import { CreateCategoryDto } from '../categories/dto/create-category.dto';
-import { UpdateCategoryDto } from '../categories/dto/update-category.dto';
+import { CategoriesService } from '../../categories/categories.service';
+import { AuthRolesGuard } from '../../../common/guards/auth-roles.guard';
+import { Roles } from '../../../common/decorators/roles.decorator';
+import { UserRoles } from '../../../common/enums/user.enum';
+import { CreateCategoryDto } from '../../categories/dto/create-category.dto';
+import { UpdateCategoryDto } from '../../categories/dto/update-category.dto';
 
 @UseGuards(AuthRolesGuard)
 @Roles(UserRoles.ADMIN, UserRoles.SUPER_ADMIN)

@@ -8,12 +8,12 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { AuthRolesGuard } from '../../common/guards/auth-roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { UserRoles } from '../../common/enums/user.enum';
-import { AiToolsService } from '../ai-tools/ai-tools.service';
-import { CreateAiToolDto } from '../ai-tools/dto/create-ai-tool.dto';
-import { UpdateAiToolDto } from '../ai-tools/dto/update-ai-tool.dto';
+import { AuthRolesGuard } from '../../../common/guards/auth-roles.guard';
+import { Roles } from '../../../common/decorators/roles.decorator';
+import { UserRoles } from '../../../common/enums/user.enum';
+import { AiToolsService } from '../../ai-tools/ai-tools.service';
+import { CreateAiToolDto } from '../../ai-tools/dto/create-ai-tool.dto';
+import { UpdateAiToolDto } from '../../ai-tools/dto/update-ai-tool.dto';
 
 @UseGuards(AuthRolesGuard)
 @Roles(UserRoles.ADMIN, UserRoles.SUPER_ADMIN)
