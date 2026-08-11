@@ -12,8 +12,8 @@ import { CategoriesService } from '../categories/categories.service';
 import { AuthRolesGuard } from '../../common/guards/auth-roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRoles } from '../../common/enums/user.enum';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CreateCategoryDto } from '../categories/dto/create-category.dto';
+import { UpdateCategoryDto } from '../categories/dto/update-category.dto';
 
 @UseGuards(AuthRolesGuard)
 @Roles(UserRoles.ADMIN, UserRoles.SUPER_ADMIN)
