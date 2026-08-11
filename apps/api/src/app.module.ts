@@ -18,6 +18,7 @@ import { HealthModule } from './modules/health/health.module';
 import { AiToolsModule } from './modules/ai-tools/ai-tools.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { PromptsModule } from './modules/prompts/prompts.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -77,6 +78,7 @@ import { PromptsModule } from './modules/prompts/prompts.module';
     AiToolsModule,
     CategoriesModule,
     PromptsModule,
+    AdminModule
   ],
   providers: [
     {
