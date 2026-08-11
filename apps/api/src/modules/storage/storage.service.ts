@@ -28,7 +28,7 @@ export class StorageService {
     this.s3Client = new S3Client({
       region: this.configService.get<string>('AWS_REGION') || 'us-east-1',
       endpoint: this.configService.get<string>('AWS_S3_ENDPOINT'),
-      forcePathStyle: true, // Required for MinIO
+      forcePathStyle: true,
       credentials: {
         accessKeyId: this.configService.get<string>('AWS_ACCESS_KEY_ID')!,
         secretAccessKey: this.configService.get<string>(
@@ -109,14 +109,5 @@ export class StorageService {
       );
       throw error;
     }
-  }
-
-  getPublicUrl(key: string): string {
-    const endpoint = this.configService.get<string>('AWS_S3_ENDPOINT')!;
-    // Normalize endpoint (remove trailing slash)
-    const normalizedEndpoint = endpoint.endsWith('/')
-      ? endpoint.slice(0, -1)
-      : endpoint;
-    return `${normalizedEndpoint}/${this.bucket}/${key}`;
   }
 }
