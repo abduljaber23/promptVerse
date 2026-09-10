@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-	themes: dark --default;
+	themes: dark --default, light;
 }
 
 /* Jeton de police global (repris par Tailwind + daisyUI) */
@@ -8,11 +8,11 @@
 	--font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
-/* Personnalisation du thème "dark" de daisyUI pour coller aux maquettes :
-   base-100 (#1d232a) est déjà celui de daisyUI dark, on ne retouche que
-   le bleu primaire et le vert de succès (prix). */
+/* Jetons de marque appliqués aux deux thèmes daisyUI (dark + light) :
+   on force le bleu primaire, le vert de succès (prix) et les rayons. */
 :root,
-[data-theme="dark"] {
+[data-theme="dark"],
+[data-theme="light"] {
 	--color-primary: #0077ff;
 	--color-primary-content: #ffffff;
 	--color-success: #34d399;

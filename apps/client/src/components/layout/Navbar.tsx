@@ -4,12 +4,15 @@ import {
 	LayoutDashboard,
 	LogOut,
 	Menu,
+	Moon,
 	PlusCircle,
 	Search,
 	Settings,
 	Shield,
+	Sun,
 } from "lucide-react";
 import { cn } from "@/common/lib/cn";
+import { useUiStore } from "@/common/store/ui.store";
 import { useAuth } from "@/context/AuthContext";
 import { Container } from "./Container";
 import { Logo } from "./Logo";
@@ -23,6 +26,8 @@ const NAV_LINKS = [
 export function Navbar() {
 	const navigate = useNavigate();
 	const { isAuthenticated, user, isAdmin, logout } = useAuth();
+	const theme = useUiStore((s) => s.theme);
+	const toggleTheme = useUiStore((s) => s.toggleTheme);
 	const [search, setSearch] = useState("");
 
 	const onSearch = (event: FormEvent) => {
@@ -96,6 +101,23 @@ export function Navbar() {
 				</form>
 
 				<div className="ml-auto flex items-center gap-2 md:ml-0">
+					<button
+						type="button"
+						onClick={toggleTheme}
+						className="btn btn-ghost btn-sm btn-circle"
+						aria-label={
+							theme === "dark"
+								? "Passer en thème clair"
+								: "Passer en thème sombre"
+						}
+					>
+						{theme === "dark" ? (
+							<Sun className="size-4" />
+						) : (
+							<Moon className="size-4" />
+						)}
+					</button>
+
 					{isAuthenticated && user ? (
 						<div className="dropdown dropdown-end">
 							<button

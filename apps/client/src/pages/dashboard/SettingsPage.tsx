@@ -13,8 +13,8 @@ import {
 } from "@/hooks/useProfile";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { getApiErrorMessage } from "@/common/lib/api-error";
+import { toast } from "@/common/store/toast.store";
 import { FormField } from "@/components/ui/FormField";
-import { Alert } from "@/components/ui/Alert";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
@@ -39,9 +39,6 @@ export function SettingsPage() {
 	const deleteAvatar = useDeleteAvatar();
 	const deleteAccount = useDeleteAccount();
 
-	const [feedback, setFeedback] = useState<
-		{ variant: "success" | "error"; message: string } | null
-	>(null);
 	const [confirmOpen, setConfirmOpen] = useState(false);
 
 	const {
@@ -58,15 +55,11 @@ export function SettingsPage() {
 	});
 
 	const onSubmit = handleSubmit(async (values) => {
-		setFeedback(null);
 		try {
 			const res = await updateProfile.mutateAsync(values);
-			setFeedback({ variant: "success", message: res.message });
+			toast.success(res.message);
 		} catch (error) {
-			setFeedback({
-				variant: "error",
-				message: getApiErrorMessage(error),
-			});
+			toast.error(getApiErrorMessage(error));
 		}
 	});
 
@@ -74,27 +67,20 @@ export function SettingsPage() {
 		const file = e.target.files?.[0];
 		e.target.value = "";
 		if (!file) return;
-		setFeedback(null);
 		try {
 			await uploadAvatar.mutateAsync(file);
-			setFeedback({ variant: "success", message: "Avatar mis à jour." });
+			toast.success("Avatar mis à jour.");
 		} catch (error) {
-			setFeedback({
-				variant: "error",
-				message: getApiErrorMessage(error),
-			});
+			toast.error(getApiErrorMessage(error));
 		}
 	};
 
 	const onDeleteAvatar = async () => {
-		setFeedback(null);
 		try {
 			await deleteAvatar.mutateAsync();
+			toast.success("Avatar retiré.");
 		} catch (error) {
-			setFeedback({
-				variant: "error",
-				message: getApiErrorMessage(error),
-			});
+			toast.error(getApiErrorMessage(error));
 		}
 	};
 
@@ -104,10 +90,7 @@ export function SettingsPage() {
 			navigate("/", { replace: true });
 		} catch (error) {
 			setConfirmOpen(false);
-			setFeedback({
-				variant: "error",
-				message: getApiErrorMessage(error),
-			});
+			toast.error(getApiErrorMessage(error));
 		}
 	};
 
@@ -118,10 +101,6 @@ export function SettingsPage() {
 			<header>
 				<h1 className="text-xl font-bold">Paramètres du compte</h1>
 			</header>
-
-			{feedback ? (
-				<Alert variant={feedback.variant}>{feedback.message}</Alert>
-			) : null}
 
 			{/* Avatar */}
 			<section className="flex items-center gap-5">

@@ -18,6 +18,15 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Applique le thème persisté avant le rendu React (évite le flash).
+      try {
+        var t = JSON.parse(localStorage.getItem("promptverse-ui") || "{}");
+        if (t && t.state && t.state.theme) {
+          document.documentElement.setAttribute("data-theme", t.state.theme);
+        }
+      } catch (e) {}
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

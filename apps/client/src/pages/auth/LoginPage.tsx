@@ -1,13 +1,12 @@
-import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "@/context/AuthContext";
 import { getApiErrorMessage } from "@/common/lib/api-error";
+import { toast } from "@/common/store/toast.store";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { FormField } from "@/components/ui/FormField";
-import { Alert } from "@/components/ui/Alert";
 
 const schema = z.object({
 	email: z.string().min(1, "L'e-mail est requis.").email("E-mail invalide."),
@@ -23,7 +22,6 @@ export function LoginPage() {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { login } = useAuth();
-	const [serverError, setServerError] = useState<string | null>(null);
 
 	const {
 		register,
@@ -32,13 +30,12 @@ export function LoginPage() {
 	} = useForm<FormValues>({ resolver: zodResolver(schema) });
 
 	const onSubmit = handleSubmit(async (values) => {
-		setServerError(null);
 		try {
 			await login(values);
 			const to = (location.state as LocationState | null)?.from ?? "/dashboard";
 			navigate(to, { replace: true });
 		} catch (error) {
-			setServerError(getApiErrorMessage(error));
+			toast.error(getApiErrorMessage(error));
 		}
 	});
 
@@ -56,10 +53,6 @@ export function LoginPage() {
 			}
 		>
 			<form onSubmit={onSubmit} className="space-y-4" noValidate>
-				{serverError ? (
-					<Alert variant="error">{serverError}</Alert>
-				) : null}
-
 				<FormField
 					label="Adresse e-mail"
 					htmlFor="email"

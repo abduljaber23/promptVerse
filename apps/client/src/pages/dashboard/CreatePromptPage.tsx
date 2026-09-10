@@ -8,8 +8,8 @@ import { useCreatePrompt } from "@/hooks/usePrompts";
 import { useAiTools, useCategories } from "@/hooks/useCatalog";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { getApiErrorMessage } from "@/common/lib/api-error";
+import { toast } from "@/common/store/toast.store";
 import { FormField } from "@/components/ui/FormField";
-import { Alert } from "@/components/ui/Alert";
 
 const MAX_PREVIEWS = 10;
 
@@ -39,7 +39,6 @@ export function CreatePromptPage() {
 
 	const [coverImage, setCoverImage] = useState<File | null>(null);
 	const [previewImages, setPreviewImages] = useState<File[]>([]);
-	const [serverError, setServerError] = useState<string | null>(null);
 
 	const {
 		register,
@@ -62,7 +61,6 @@ export function CreatePromptPage() {
 	};
 
 	const onSubmit = handleSubmit(async (values) => {
-		setServerError(null);
 		try {
 			const created = await createPrompt.mutateAsync({
 				title: values.title,
@@ -74,9 +72,10 @@ export function CreatePromptPage() {
 				coverImage,
 				previewImages,
 			});
+			toast.success("Prompt publié.");
 			navigate(`/prompts/${created.slug}`);
 		} catch (error) {
-			setServerError(getApiErrorMessage(error));
+			toast.error(getApiErrorMessage(error));
 		}
 	});
 
@@ -91,10 +90,6 @@ export function CreatePromptPage() {
 			</header>
 
 			<form onSubmit={onSubmit} className="space-y-5" noValidate>
-				{serverError ? (
-					<Alert variant="error">{serverError}</Alert>
-				) : null}
-
 				<FormField
 					label="Titre du prompt"
 					htmlFor="title"

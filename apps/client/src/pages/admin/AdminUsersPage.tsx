@@ -1,9 +1,9 @@
-import { useState } from "react";
 import { useAdminUsers, useMakeRole } from "@/hooks/useAdmin";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { UserRole } from "@/common/constants/roles";
 import type { UserRole as UserRoleType } from "@/common/constants/roles";
 import { getApiErrorMessage } from "@/common/lib/api-error";
+import { toast } from "@/common/store/toast.store";
 import { formatDate } from "@/common/lib/format";
 import { Alert } from "@/components/ui/Alert";
 import { Spinner } from "@/components/ui/Spinner";
@@ -24,15 +24,13 @@ export function AdminUsersPage() {
 	useDocumentTitle("Utilisateurs — Admin PromptVerse");
 	const { data, isLoading, isError, error } = useAdminUsers();
 	const makeRole = useMakeRole();
-	const [feedback, setFeedback] = useState<string | null>(null);
 
 	const changeRole = async (userId: string, role: UserRoleType) => {
-		setFeedback(null);
 		try {
 			await makeRole.mutateAsync({ userId, role });
-			setFeedback("Rôle mis à jour.");
+			toast.success("Rôle mis à jour.");
 		} catch (err) {
-			setFeedback(getApiErrorMessage(err));
+			toast.error(getApiErrorMessage(err));
 		}
 	};
 
@@ -48,8 +46,6 @@ export function AdminUsersPage() {
 				{(data?.length ?? 0) > 1 ? "s" : ""} inscrit
 				{(data?.length ?? 0) > 1 ? "s" : ""}
 			</p>
-
-			{feedback ? <Alert variant="info">{feedback}</Alert> : null}
 
 			<div className="overflow-x-auto rounded-box border border-base-content/10">
 				<table className="table table-sm">

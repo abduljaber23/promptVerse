@@ -3,6 +3,7 @@ import type { UseQueryResult } from "@tanstack/react-query";
 import { ArchiveRestore, Check, Pencil, Trash2, X } from "lucide-react";
 import type { AiTool, Category } from "@/common/types";
 import { getApiErrorMessage } from "@/common/lib/api-error";
+import { toast } from "@/common/store/toast.store";
 import { formatDate } from "@/common/lib/format";
 import { Alert } from "@/components/ui/Alert";
 import { Spinner } from "@/components/ui/Spinner";
@@ -45,22 +46,18 @@ export function CatalogManager({
 	const [name, setName] = useState("");
 	const [editingId, setEditingId] = useState<string | null>(null);
 	const [editingName, setEditingName] = useState("");
-	const [error, setError] = useState<string | null>(null);
 	const [toDelete, setToDelete] = useState<CatalogItem | null>(null);
 
 	const run = async (fn: () => Promise<unknown>) => {
-		setError(null);
 		try {
 			await fn();
 		} catch (err) {
-			setError(getApiErrorMessage(err));
+			toast.error(getApiErrorMessage(err));
 		}
 	};
 
 	return (
 		<div className="space-y-8">
-			{error ? <Alert variant="error">{error}</Alert> : null}
-
 			<form
 				className="flex flex-wrap gap-2"
 				onSubmit={(e) => {

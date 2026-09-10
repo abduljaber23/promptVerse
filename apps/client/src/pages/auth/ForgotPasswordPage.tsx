@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useForgotPassword } from "@/hooks/useAuthFlows";
 import { getApiErrorMessage } from "@/common/lib/api-error";
+import { toast } from "@/common/store/toast.store";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { FormField } from "@/components/ui/FormField";
 import { Alert } from "@/components/ui/Alert";
@@ -17,7 +18,6 @@ type FormValues = z.infer<typeof schema>;
 export function ForgotPasswordPage() {
 	const forgotPassword = useForgotPassword();
 	const [message, setMessage] = useState<string | null>(null);
-	const [error, setError] = useState<string | null>(null);
 
 	const {
 		register,
@@ -26,12 +26,11 @@ export function ForgotPasswordPage() {
 	} = useForm<FormValues>({ resolver: zodResolver(schema) });
 
 	const onSubmit = handleSubmit(async (values) => {
-		setError(null);
 		try {
 			const res = await forgotPassword.mutateAsync(values.email);
 			setMessage(res.message);
 		} catch (err) {
-			setError(getApiErrorMessage(err));
+			toast.error(getApiErrorMessage(err));
 		}
 	});
 
@@ -49,7 +48,6 @@ export function ForgotPasswordPage() {
 				<Alert variant="success">{message}</Alert>
 			) : (
 				<form onSubmit={onSubmit} className="space-y-4" noValidate>
-					{error ? <Alert variant="error">{error}</Alert> : null}
 					<FormField
 						label="Adresse e-mail"
 						htmlFor="email"

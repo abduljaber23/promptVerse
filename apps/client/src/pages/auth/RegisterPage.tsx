@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "@/context/AuthContext";
 import { getApiErrorMessage } from "@/common/lib/api-error";
+import { toast } from "@/common/store/toast.store";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { FormField } from "@/components/ui/FormField";
 import { Alert } from "@/components/ui/Alert";
@@ -30,7 +31,6 @@ type FormValues = z.infer<typeof schema>;
 
 export function RegisterPage() {
 	const { register: registerUser } = useAuth();
-	const [serverError, setServerError] = useState<string | null>(null);
 	const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
 	const {
@@ -40,7 +40,6 @@ export function RegisterPage() {
 	} = useForm<FormValues>({ resolver: zodResolver(schema) });
 
 	const onSubmit = handleSubmit(async (values) => {
-		setServerError(null);
 		try {
 			const res = await registerUser({
 				username: values.username,
@@ -49,7 +48,7 @@ export function RegisterPage() {
 			});
 			setSuccessMessage(res.message);
 		} catch (error) {
-			setServerError(getApiErrorMessage(error));
+			toast.error(getApiErrorMessage(error));
 		}
 	});
 
@@ -70,10 +69,6 @@ export function RegisterPage() {
 				<Alert variant="success">{successMessage}</Alert>
 			) : (
 				<form onSubmit={onSubmit} className="space-y-4" noValidate>
-					{serverError ? (
-						<Alert variant="error">{serverError}</Alert>
-					) : null}
-
 					<FormField
 						label="Nom d'utilisateur"
 						htmlFor="username"

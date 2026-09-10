@@ -1,30 +1,66 @@
-import {
-	createContext,
-	useCallback,
-	useContext,
-	useMemo,
-	type ReactNode,
-} from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/common/api/admin.api";
 import { authApi } from "@/common/api/auth.api";
 import { usersApi } from "@/common/api/users.api";
 import { queryKeys } from "@/common/constants/query-keys";
-import type {
-	CurrentUser,
-	LoginPayload,
-	RegisterPayload,
-} from "@/common/types";
+import { useAuthStore } from "@/common/store/auth.store";
+import type { LoginPayload, RegisterPayload } from "@/common/types";
 
-type AuthStatus = "pending" | "authenticated" | "unauthenticated";
+const SESSION_STALE_TIME = 5 * 60 * 1000;
 
-interface AuthContextValue {
-	user: CurrentUser | null;
-	status: AuthStatus;
+/**
+ * Synchronise la session (TanStack Query) vers le store Zustand `useAuthStore`.
+ * Monté une seule fois, à la racine — ne rend rien.
+ *
+ * - `/users/me` : source de vérité de l'utilisateur connecté.
+ * - `/admin/users/count` : sonde de rôle (200 => admin, 403 => simple user),
+ *   car `/users/me` ne renvoie pas le rôle.
+ */
+export function AuthBootstrap() {
+	const meQuery = useQuery({
+		queryKey: queryKeys.auth.me,
+		queryFn: usersApi.me,
+		retry: false,
+		staleTime: SESSION_STALE_TIME,
+	});
+
+	const isAuthenticated = meQuery.isSuccess && !!meQuery.data;
+
+	const adminQuery = useQuery({
+		queryKey: queryKeys.auth.isAdmin,
+		queryFn: adminApi.countUsers,
+		enabled: isAuthenticated,
+		retry: false,
+		staleTime: SESSION_STALE_TIME,
+	});
+
+	useEffect(() => {
+		const { setSession } = useAuthStore.getState();
+		if (meQuery.isPending) {
+			setSession(null, "pending");
+		} else if (isAuthenticated) {
+			setSession(meQuery.data, "authenticated");
+		} else {
+			setSession(null, "unauthenticated");
+		}
+	}, [meQuery.isPending, meQuery.data, isAuthenticated]);
+
+	useEffect(() => {
+		if (!isAuthenticated) return;
+		useAuthStore
+			.getState()
+			.setAdmin(adminQuery.isSuccess, !adminQuery.isPending);
+	}, [isAuthenticated, adminQuery.isSuccess, adminQuery.isPending]);
+
+	return null;
+}
+
+interface UseAuthValue {
+	user: ReturnType<typeof useAuthStore.getState>["user"];
+	status: ReturnType<typeof useAuthStore.getState>["status"];
 	isAuthenticated: boolean;
-	/** `true` si l'API accepte les endpoints /admin (rôle ADMIN ou SUPER_ADMIN). */
 	isAdmin: boolean;
-	/** `true` une fois la vérification du rôle admin terminée. */
 	adminChecked: boolean;
 	login: (payload: LoginPayload) => Promise<void>;
 	register: (payload: RegisterPayload) => Promise<{ message: string }>;
@@ -32,52 +68,27 @@ interface AuthContextValue {
 	refetchUser: () => void;
 }
 
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
-
-export function AuthProvider({ children }: { children: ReactNode }) {
+/**
+ * Accès à la session courante + actions d'auth.
+ * L'état vient du store Zustand ; le rafraîchissement passe par TanStack Query.
+ */
+// eslint-disable-next-line react-refresh/only-export-components
+export function useAuth(): UseAuthValue {
 	const queryClient = useQueryClient();
+	const user = useAuthStore((s) => s.user);
+	const status = useAuthStore((s) => s.status);
+	const isAdmin = useAuthStore((s) => s.isAdmin);
+	const adminChecked = useAuthStore((s) => s.adminChecked);
 
-	const meQuery = useQuery({
-		queryKey: queryKeys.auth.me,
-		queryFn: usersApi.me,
-		retry: false,
-		staleTime: 5 * 60 * 1000,
-	});
-
-	const isAuthenticated = meQuery.isSuccess && !!meQuery.data;
-
-	// Le endpoint /users/me ne renvoie pas le rôle : on sonde /admin/users/count.
-	// 200 => admin, 403 => simple utilisateur.
-	const adminQuery = useQuery({
-		queryKey: queryKeys.auth.isAdmin,
-		queryFn: adminApi.countUsers,
-		enabled: isAuthenticated,
-		retry: false,
-		staleTime: 5 * 60 * 1000,
-	});
-
-	const loginMutation = useMutation({
-		mutationFn: authApi.login,
-		onSuccess: async () => {
+	const login = useCallback(
+		async (payload: LoginPayload) => {
+			await authApi.login(payload);
 			await queryClient.invalidateQueries({ queryKey: queryKeys.auth.me });
 			await queryClient.invalidateQueries({
 				queryKey: queryKeys.auth.isAdmin,
 			});
 		},
-	});
-
-	const logoutMutation = useMutation({
-		mutationFn: authApi.logout,
-		onSettled: () => {
-			queryClient.clear();
-		},
-	});
-
-	const login = useCallback(
-		async (payload: LoginPayload) => {
-			await loginMutation.mutateAsync(payload);
-		},
-		[loginMutation],
+		[queryClient],
 	);
 
 	const register = useCallback(
@@ -86,52 +97,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	);
 
 	const logout = useCallback(async () => {
-		await logoutMutation.mutateAsync();
-	}, [logoutMutation]);
+		try {
+			await authApi.logout();
+		} finally {
+			useAuthStore.getState().reset();
+			queryClient.clear();
+		}
+	}, [queryClient]);
 
 	const refetchUser = useCallback(() => {
-		void meQuery.refetch();
-	}, [meQuery]);
+		void queryClient.invalidateQueries({ queryKey: queryKeys.auth.me });
+	}, [queryClient]);
 
-	const status: AuthStatus = meQuery.isPending
-		? "pending"
-		: isAuthenticated
-			? "authenticated"
-			: "unauthenticated";
-
-	const value = useMemo<AuthContextValue>(
-		() => ({
-			user: meQuery.data ?? null,
-			status,
-			isAuthenticated,
-			isAdmin: adminQuery.isSuccess,
-			adminChecked: !isAuthenticated || !adminQuery.isPending,
-			login,
-			register,
-			logout,
-			refetchUser,
-		}),
-		[
-			meQuery.data,
-			status,
-			isAuthenticated,
-			adminQuery.isSuccess,
-			adminQuery.isPending,
-			login,
-			register,
-			logout,
-			refetchUser,
-		],
-	);
-
-	return <AuthContext value={value}>{children}</AuthContext>;
-}
-
-// eslint-disable-next-line react-refresh/only-export-components
-export function useAuth(): AuthContextValue {
-	const ctx = useContext(AuthContext);
-	if (!ctx) {
-		throw new Error("useAuth doit être utilisé dans <AuthProvider>.");
-	}
-	return ctx;
+	return {
+		user,
+		status,
+		isAuthenticated: status === "authenticated",
+		isAdmin,
+		adminChecked,
+		login,
+		register,
+		logout,
+		refetchUser,
+	};
 }

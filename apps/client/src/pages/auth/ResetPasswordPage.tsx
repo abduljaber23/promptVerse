@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useResetPassword, useValidateResetLink } from "@/hooks/useAuthFlows";
 import { getApiErrorMessage } from "@/common/lib/api-error";
+import { toast } from "@/common/store/toast.store";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { FormField } from "@/components/ui/FormField";
 import { Alert } from "@/components/ui/Alert";
@@ -26,7 +27,6 @@ export function ResetPasswordPage() {
 	const linkCheck = useValidateResetLink(id, token);
 	const resetPassword = useResetPassword();
 	const [done, setDone] = useState(false);
-	const [error, setError] = useState<string | null>(null);
 
 	const {
 		register,
@@ -35,7 +35,6 @@ export function ResetPasswordPage() {
 	} = useForm<FormValues>({ resolver: zodResolver(schema) });
 
 	const onSubmit = handleSubmit(async (values) => {
-		setError(null);
 		try {
 			await resetPassword.mutateAsync({
 				userId: id as string,
@@ -44,7 +43,7 @@ export function ResetPasswordPage() {
 			});
 			setDone(true);
 		} catch (err) {
-			setError(getApiErrorMessage(err));
+			toast.error(getApiErrorMessage(err));
 		}
 	});
 
@@ -75,7 +74,6 @@ export function ResetPasswordPage() {
 				</Alert>
 			) : (
 				<form onSubmit={onSubmit} className="space-y-4" noValidate>
-					{error ? <Alert variant="error">{error}</Alert> : null}
 					<FormField
 						label="Nouveau mot de passe"
 						htmlFor="newPassword"

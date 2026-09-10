@@ -3,7 +3,9 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { AuthProvider } from "@/context/AuthContext";
+import { AuthBootstrap } from "@/context/AuthContext";
+import { Toaster } from "@/components/ui/Toaster";
+import "@/common/store/ui.store"; // applique le thème persistant au chargement
 import App from "./App.tsx";
 import "./index.css";
 
@@ -21,10 +23,10 @@ createRoot(document.getElementById("root")!).render(
 	<StrictMode>
 		<QueryClientProvider client={queryClient}>
 			<BrowserRouter>
-				<AuthProvider>
-					<App />
-				</AuthProvider>
+				<AuthBootstrap />
+				<App />
 			</BrowserRouter>
+			<Toaster />
 			{import.meta.env.DEV ? (
 				<ReactQueryDevtools initialIsOpen={false} />
 			) : null}
