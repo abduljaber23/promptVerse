@@ -78,7 +78,7 @@ import { AdminModule } from './modules/admin/admin.module';
     AiToolsModule,
     CategoriesModule,
     PromptsModule,
-    AdminModule
+    AdminModule,
   ],
   providers: [
     {
