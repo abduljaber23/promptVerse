@@ -34,6 +34,9 @@ export class AdminUsersService {
     }
 
     const normalizedRole = role.trim().toUpperCase() as UserRoles;
+    if (!Object.values(UserRoles).includes(normalizedRole)) {
+      throw new BadRequestException(`Invalid role: ${role}`);
+    }
 
     user.role = normalizedRole;
     return this.usersRepository.save(user);
