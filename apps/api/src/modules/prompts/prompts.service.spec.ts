@@ -114,5 +114,15 @@ describe('PromptsService', () => {
       expect(result.promptContent).toBe('the secret sauce');
       expect(result.isPurchasedByCurrentUser).toBe(true);
     });
+
+    it('reveals promptContent for a free prompt without checking purchases, even anonymously', async () => {
+      findOnePrompt.mockResolvedValue({ ...basePrompt, price: '0.00' });
+
+      const result = await service.findOneBySlug('test-prompt');
+
+      expect(result.promptContent).toBe('the secret sauce');
+      expect(result.isPurchasedByCurrentUser).toBe(false);
+      expect(purchasesExists).not.toHaveBeenCalled();
+    });
   });
 });

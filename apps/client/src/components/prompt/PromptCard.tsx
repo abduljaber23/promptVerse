@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Sparkles } from "lucide-react";
 import type { Prompt } from "@/common/types";
-import { formatPrice } from "@/common/lib/format";
+import { formatPromptPrice } from "@/common/lib/format";
 import { resolveAssetUrl } from "@/common/lib/assets";
 import { Thumbnail } from "@/components/ui/Thumbnail";
 import { RatingStars } from "@/components/ui/RatingStars";
@@ -58,7 +58,7 @@ export function PromptCard({
 				/>
 				<div className="mt-auto flex items-center justify-between pt-2">
 					<span className="text-base font-bold text-success">
-						{formatPrice(prompt.price)}
+						{formatPromptPrice(prompt.price)}
 					</span>
 					<span className="text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
 						Voir le prompt →

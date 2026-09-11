@@ -26,7 +26,7 @@ import { MailModule } from '../mail/mail.module';
           );
         }
       },
-      limits: { fileSize: 1024 * 1024 * 2 }, // 2 megabytes
+      limits: { fileSize: 1024 * 1024 * 5 }, // 5 megabytes
     }),
   ],
   controllers: [UsersController],

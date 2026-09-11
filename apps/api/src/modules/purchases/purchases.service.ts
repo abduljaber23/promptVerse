@@ -40,6 +40,14 @@ export class PurchasesService {
   ): Promise<{ url: string }> {
     const prompt = await this.promptsService.findByIdForPurchase(promptId);
 
+    // Un prompt gratuit se débloque directement à la lecture
+    // (PromptsService.findOneBySlug) — jamais via Stripe.
+    if (PromptsService.isFree(prompt.price)) {
+      throw new BadRequestException({
+        code: ErrorCodes.PROMPT_IS_FREE,
+      });
+    }
+
     if (prompt.sellerId === buyerId) {
       throw new BadRequestException({
         code: ErrorCodes.CANNOT_PURCHASE_OWN_PROMPT,

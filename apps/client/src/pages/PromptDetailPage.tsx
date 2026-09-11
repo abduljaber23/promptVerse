@@ -15,7 +15,7 @@ import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useAuth } from "@/context/AuthContext";
 import { getApiErrorMessage, getStatus } from "@/common/lib/api-error";
 import { resolveAssetUrl } from "@/common/lib/assets";
-import { formatCount, formatPrice } from "@/common/lib/format";
+import { formatCount, formatPromptPrice } from "@/common/lib/format";
 import { toast } from "@/common/store/toast.store";
 import { Container } from "@/components/layout/Container";
 import { Thumbnail } from "@/components/ui/Thumbnail";
@@ -75,7 +75,9 @@ export function PromptDetailPage() {
 	const category = categoryById.get(prompt.categoryId);
 	const aiTool = aiToolById.get(prompt.aiToolId);
 	const isOwner = isAuthenticated && user?.id === prompt.sellerId;
-	const hasAccess = isOwner || Boolean(prompt.isPurchasedByCurrentUser);
+	const isFree = Number.parseFloat(prompt.price) === 0;
+	const hasAccess =
+		isOwner || isFree || Boolean(prompt.isPurchasedByCurrentUser);
 	const promptId = prompt.id;
 
 	async function handleBuyClick() {
@@ -213,15 +215,22 @@ export function PromptDetailPage() {
 				<aside className="lg:sticky lg:top-24 lg:self-start">
 					<div className="rounded-box border border-base-content/10 bg-base-200/50 p-6">
 						<p className="text-3xl font-bold text-success">
-							{formatPrice(prompt.price)}
+							{formatPromptPrice(prompt.price)}
 						</p>
 						<p className="mt-1 text-xs text-base-content/55">
-							Accès immédiat après paiement.
+							{isFree
+								? "Accès immédiat, sans paiement."
+								: "Accès immédiat après paiement."}
 						</p>
 
 						{isOwner ? (
 							<div className="badge badge-outline mt-5 w-full py-3">
 								Votre prompt
+							</div>
+						) : isFree ? (
+							<div className="alert alert-success mt-5 py-3 text-sm">
+								<CheckCircle2 className="size-4" />
+								Prompt gratuit — débloqué
 							</div>
 						) : hasAccess ? (
 							<div className="alert alert-success mt-5 py-3 text-sm">

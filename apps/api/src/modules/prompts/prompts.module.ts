@@ -27,7 +27,7 @@ import { ErrorCodes } from '../../common/errors/error-codes';
           );
         }
       },
-      limits: { fileSize: 1024 * 1024 * 3 }, // 50 megabytes
+      limits: { fileSize: 1024 * 1024 * 8 }, // 8 megabytes
     }),
     UsersModule,
     CategoriesModule,

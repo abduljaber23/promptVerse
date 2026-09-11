@@ -11,6 +11,7 @@ Ce dossier contient votre kit de révision complet pour défendre le projet **Pr
 * 📄 **[users.md](file:///c:/FormationCDA/projet_final/PromptVerse/docs/oral_cda/users.md)** — *Module Utilisateurs & Entités (`UsersService`, entités `User`/`UserProfile`/`SocialLink`, UUIDs, Soft Delete, `@Exclude()`).*
 * 📄 **[storage.md](file:///c:/FormationCDA/projet_final/PromptVerse/docs/oral_cda/storage.md)** — *Module Stockage Fichiers S3/MinIO (`StorageService`, `S3Client`, `forcePathStyle`, upload avatars/media, gestion `NoSuchKey`).*
 * 📄 **[mail.md](file:///c:/FormationCDA/projet_final/PromptVerse/docs/oral_cda/mail.md)** — *Module Email (`MailService`, templates Handlebars, Logger NestJS, gestion d'erreurs SMTP).*
+* 📄 **[payments.md](file:///c:/FormationCDA/projet_final/PromptVerse/docs/oral_cda/payments.md)** — *Module Paiement Stripe (`PurchasesService`, Checkout Session, webhook signé, verrouillage du contenu payant, idempotence, solde vendeur).*
 
 ---
 

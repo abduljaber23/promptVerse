@@ -87,17 +87,22 @@ export class PromptsService {
     }
 
     const isOwner = currentUserId === prompt.sellerId;
+    const isFree = PromptsService.isFree(prompt.price);
     const hasPurchased =
-      !isOwner && currentUserId
+      !isOwner && !isFree && currentUserId
         ? await this.hasCompletedPurchase(currentUserId, prompt.id)
         : false;
-    const canViewFullContent = isOwner || hasPurchased;
+    const canViewFullContent = isOwner || isFree || hasPurchased;
 
     return {
       ...prompt,
       promptContent: canViewFullContent ? prompt.promptContent : null,
       isPurchasedByCurrentUser: hasPurchased,
     };
+  }
+
+  static isFree(price: string): boolean {
+    return Number.parseFloat(price) === 0;
   }
 
   hasCompletedPurchase(buyerId: string, promptId: string): Promise<boolean> {

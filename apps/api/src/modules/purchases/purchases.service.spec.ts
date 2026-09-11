@@ -83,6 +83,18 @@ describe('PurchasesService', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
+    it('rejects creating a Stripe session for a free prompt', async () => {
+      promptsService.findByIdForPurchase.mockResolvedValue({
+        ...prompt,
+        price: '0.00',
+      });
+
+      await expect(
+        service.createCheckoutSession('buyer-1', 'prompt-1'),
+      ).rejects.toThrow(BadRequestException);
+      expect(stripeService.createCheckoutSession).not.toHaveBeenCalled();
+    });
+
     it('rejects buying an already-purchased prompt', async () => {
       promptsService.findByIdForPurchase.mockResolvedValue(prompt);
       promptsService.hasCompletedPurchase.mockResolvedValue(true);

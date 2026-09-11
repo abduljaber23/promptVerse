@@ -3,7 +3,7 @@ import { PlusCircle, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useMyPrompts } from "@/hooks/usePrompts";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
-import { formatDate, formatPrice } from "@/common/lib/format";
+import { formatDate, formatPrice, formatPromptPrice } from "@/common/lib/format";
 import { getApiErrorMessage } from "@/common/lib/api-error";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { PromptGrid } from "@/components/prompt/PromptGrid";
@@ -122,7 +122,7 @@ export function DashboardPage() {
 												{p.title}
 											</Link>
 										</td>
-										<td>{formatPrice(p.price)}</td>
+										<td>{formatPromptPrice(p.price)}</td>
 										<td>{p.salesCount}</td>
 										<td>{formatDate(p.createdAt)}</td>
 									</tr>

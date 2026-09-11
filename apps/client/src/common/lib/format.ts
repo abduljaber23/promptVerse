@@ -15,6 +15,17 @@ export function formatPrice(value: string | number): string {
 	return priceFormatter.format(Number.isFinite(n) ? n : 0);
 }
 
+/**
+ * Comme `formatPrice`, mais pour le prix d'un prompt : "0" → "Gratuit".
+ * Ne pas utiliser pour un solde ou un montant déjà payé (0 y est un montant
+ * réel, pas "gratuit") — uniquement pour `Prompt.price`.
+ */
+export function formatPromptPrice(value: string | number): string {
+	const n = typeof value === "string" ? Number.parseFloat(value) : value;
+	if (Number.isFinite(n) && n === 0) return "Gratuit";
+	return formatPrice(value);
+}
+
 /** ISO string → "4 août 2026" */
 export function formatDate(value: string | null | undefined): string {
 	if (!value) return "—";
