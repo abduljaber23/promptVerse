@@ -1,26 +1,40 @@
 import { Link } from "react-router-dom";
 import { Container } from "./Container";
+import { useAuth } from "@/context/AuthContext";
 
-const COLUMNS = [
-	{
-		title: "Produit",
-		links: [
-			{ to: "/prompts", label: "Catalogue" },
-			{ to: "/dashboard/prompts/new", label: "Vendre un prompt" },
-			{ to: "/dashboard", label: "Tableau de bord" },
-		],
-	},
-	{
-		title: "Compte",
-		links: [
-			{ to: "/login", label: "Connexion" },
-			{ to: "/register", label: "Inscription" },
-			{ to: "/forgot-password", label: "Mot de passe oublié" },
-		],
-	},
-];
+const PRODUCT_COLUMN = {
+	title: "Produit",
+	links: [
+		{ to: "/prompts", label: "Catalogue" },
+		{ to: "/dashboard/prompts/new", label: "Vendre un prompt" },
+		{ to: "/dashboard", label: "Tableau de bord" },
+	],
+};
+
+const GUEST_ACCOUNT_COLUMN = {
+	title: "Compte",
+	links: [
+		{ to: "/login", label: "Connexion" },
+		{ to: "/register", label: "Inscription" },
+		{ to: "/forgot-password", label: "Mot de passe oublié" },
+	],
+};
+
+const AUTHENTICATED_ACCOUNT_COLUMN = {
+	title: "Compte",
+	links: [
+		{ to: "/dashboard", label: "Tableau de bord" },
+		{ to: "/dashboard/settings", label: "Paramètres" },
+	],
+};
 
 export function Footer() {
+	const { isAuthenticated } = useAuth();
+	const columns = [
+		PRODUCT_COLUMN,
+		isAuthenticated ? AUTHENTICATED_ACCOUNT_COLUMN : GUEST_ACCOUNT_COLUMN,
+	];
+
 	return (
 		<footer className="mt-auto border-t border-base-content/10 bg-base-200/40">
 			<Container size="wide" className="grid gap-8 py-12 sm:grid-cols-3">
@@ -33,7 +47,7 @@ export function Footer() {
 						l'emploi. Achetez, vendez, gagnez du temps.
 					</p>
 				</div>
-				{COLUMNS.map((col) => (
+				{columns.map((col) => (
 					<div key={col.title}>
 						<h4 className="text-xs font-semibold uppercase tracking-wide text-base-content/70">
 							{col.title}

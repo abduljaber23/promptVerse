@@ -4,6 +4,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AdminRoute } from "@/components/auth/AdminRoute";
+import { GuestRoute } from "@/components/auth/GuestRoute";
 
 import { HomePage } from "@/pages/HomePage";
 import { CatalogPage } from "@/pages/CatalogPage";
@@ -70,9 +71,14 @@ export function AppRoutes() {
 			</Route>
 
 			{/* Écrans plein écran, sans navbar/footer */}
-			<Route path="login" element={<LoginPage />} />
-			<Route path="register" element={<RegisterPage />} />
-			<Route path="forgot-password" element={<ForgotPasswordPage />} />
+			<Route element={<GuestRoute />}>
+				<Route path="login" element={<LoginPage />} />
+				<Route path="register" element={<RegisterPage />} />
+				<Route
+					path="forgot-password"
+					element={<ForgotPasswordPage />}
+				/>
+			</Route>
 			<Route
 				path="reset-password/:id/:token"
 				element={<ResetPasswordPage />}
