@@ -1,0 +1,138 @@
+name: promptverse
+
+# Sur le VPS :  docker compose -f docker-compose.prod.yml up -d
+# Images pré-construites par la CI (voir .github/workflows/deploy.yml), pas de
+# `build:` ici. `.env` doit exister à côté de ce fichier (jamais commité, jamais
+# copié par la CI — à créer une fois manuellement sur le VPS).
+
+services:
+  # ────────────────────── Reverse proxy (TLS + routage) ───────────────────
+  # Certbot tourne en natif sur l'hôte (apt install certbot), pas en conteneur —
+  # voir les étapes VPS. Ces deux chemins sont donc montés directement depuis
+  # l'hôte : /etc/letsencrypt (certificats) et /var/www/certbot (challenge ACME
+  # en mode webroot pour le renouvellement, une fois nginx déjà démarré).
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: promptverse_nginx
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      api:
+        condition: service_healthy
+      client:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ───────────────────────────── API (NestJS) ─────────────────────────────
+  api:
+    image: ${DOCKER_USERNAME}/promptverse-backend:${IMAGE_TAG:-latest}
+    container_name: promptverse_api
+    env_file: .env
+    environment:
+      # Couplages réseau imposés (doivent correspondre aux noms de services).
+      NODE_ENV: production
+      PORT: "3000"
+      DB_HOST: database
+      DB_PORT: "3306"
+      REDIS_URL: redis://redis:6379
+      AWS_S3_ENDPOINT: http://minio:9000
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio-setup:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # ─────────────────────────── Client (React/nginx) ──────────────────────
+  client:
+    image: ${DOCKER_USERNAME}/promptverse-frontend:${IMAGE_TAG:-latest}
+    container_name: promptverse_client
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ───────────────────────────── MySQL ──────────────────────────────────
+  database:
+    image: mysql:8.4
+    container_name: promptverse_database
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME:-prompt_verse}
+      MYSQL_USER: ${DB_USER:-promptverse}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+
+  # ───────────────────────────── Redis ─────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: promptverse_redis
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  # ──────────────────────── MinIO (stockage S3) ────────────────────────
+  minio:
+    image: minio/minio:latest
+    container_name: promptverse_minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+    restart: unless-stopped
+
+  # One-shot : crée le bucket et le rend lisible publiquement (VITE_ASSETS_URL).
+  minio-setup:
+    image: minio/mc:latest
+    container_name: promptverse_minio_setup
+    depends_on:
+      minio:
+        condition: service_started
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-prompt-verse}
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        set -e
+        until mc alias set local http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"; do
+          echo 'En attente de MinIO...'; sleep 2;
+        done
+        mc mb --ignore-existing "local/$$AWS_S3_BUCKET"
+        mc anonymous set download "local/$$AWS_S3_BUCKET"
+        echo "Bucket MinIO prêt : $$AWS_S3_BUCKET"
+    restart: "no"
+
+volumes:
+  mysql_data:
+  minio_data:
+  redis_data:
+
+networks:
+  default:
+    name: promptverse_network
