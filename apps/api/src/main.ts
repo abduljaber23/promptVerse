@@ -10,7 +10,13 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  // `rawBody: true` conserve le Buffer brut de chaque requête sur `req.rawBody`
+  // en plus du parsing JSON habituel — nécessaire pour vérifier la signature
+  // du webhook Stripe (`purchases.controller.ts`), qui doit hasher le corps
+  // exact envoyé par Stripe, pas sa version re-sérialisée.
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    rawBody: true,
+  });
 
   app.enableShutdownHooks();
 

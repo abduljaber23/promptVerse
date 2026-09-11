@@ -1,18 +1,22 @@
 import { useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import {
 	ArrowLeft,
+	CheckCircle2,
 	Eye,
 	Lock,
 	ShoppingCart,
 	TrendingUp,
 } from "lucide-react";
 import { usePromptBySlug } from "@/hooks/usePrompts";
+import { useCreateCheckoutSession } from "@/hooks/usePurchases";
 import { useCatalogMaps } from "@/hooks/useCatalog";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { useAuth } from "@/context/AuthContext";
 import { getApiErrorMessage, getStatus } from "@/common/lib/api-error";
 import { resolveAssetUrl } from "@/common/lib/assets";
 import { formatCount, formatPrice } from "@/common/lib/format";
+import { toast } from "@/common/store/toast.store";
 import { Container } from "@/components/layout/Container";
 import { Thumbnail } from "@/components/ui/Thumbnail";
 import { RatingStars } from "@/components/ui/RatingStars";
@@ -24,6 +28,10 @@ export function PromptDetailPage() {
 	const { slug } = useParams<{ slug: string }>();
 	const { data: prompt, isLoading, isError, error } = usePromptBySlug(slug);
 	const { aiToolById, categoryById } = useCatalogMaps();
+	const { isAuthenticated, user } = useAuth();
+	const navigate = useNavigate();
+	const location = useLocation();
+	const createCheckoutSession = useCreateCheckoutSession();
 	const [activeImage, setActiveImage] = useState(0);
 
 	useDocumentTitle(
@@ -66,6 +74,23 @@ export function PromptDetailPage() {
 
 	const category = categoryById.get(prompt.categoryId);
 	const aiTool = aiToolById.get(prompt.aiToolId);
+	const isOwner = isAuthenticated && user?.id === prompt.sellerId;
+	const hasAccess = isOwner || Boolean(prompt.isPurchasedByCurrentUser);
+	const promptId = prompt.id;
+
+	async function handleBuyClick() {
+		if (!isAuthenticated) {
+			navigate("/login", { state: { from: location.pathname } });
+			return;
+		}
+
+		try {
+			const { url } = await createCheckoutSession.mutateAsync(promptId);
+			window.location.href = url;
+		} catch (err) {
+			toast.error(getApiErrorMessage(err));
+		}
+	}
 
 	return (
 		<Container size="wide" className="py-8">
@@ -156,19 +181,17 @@ export function PromptDetailPage() {
 						</section>
 					) : null}
 
-					{/* Contenu verrouillé */}
+					{/* Contenu du prompt : en clair si débloqué, verrouillé sinon */}
 					<section className="space-y-3">
 						<h2 className="text-lg font-semibold">
 							Le prompt exact
 						</h2>
-						<div className="relative overflow-hidden rounded-box border border-base-content/10 bg-base-200/50 p-4">
-							<p
-								aria-hidden
-								className="pointer-events-none select-none whitespace-pre-wrap text-sm leading-relaxed text-base-content/70 blur-sm"
-							>
-								{prompt.promptContent.slice(0, 320)}
-							</p>
-							<div className="absolute inset-0 grid place-items-center bg-base-200/70 backdrop-blur-[2px]">
+						{hasAccess ? (
+							<div className="whitespace-pre-wrap rounded-box border border-base-content/10 bg-base-200/50 p-4 text-sm leading-relaxed text-base-content/80">
+								{prompt.promptContent}
+							</div>
+						) : (
+							<div className="rounded-box border border-base-content/10 bg-base-200/50 p-10">
 								<div className="flex flex-col items-center gap-2 text-center">
 									<span className="grid size-11 place-items-center rounded-full bg-primary/15 text-primary">
 										<Lock className="size-5" />
@@ -182,7 +205,7 @@ export function PromptDetailPage() {
 									</p>
 								</div>
 							</div>
-						</div>
+						)}
 					</section>
 				</div>
 
@@ -196,18 +219,30 @@ export function PromptDetailPage() {
 							Accès immédiat après paiement.
 						</p>
 
-						<button
-							type="button"
-							className="btn btn-primary mt-5 w-full"
-							disabled
-						>
-							<ShoppingCart className="size-4" />
-							Acheter (bientôt disponible)
-						</button>
-						<p className="mt-2 text-center text-xs text-base-content/45">
-							Le paiement Stripe n'est pas encore actif sur cette
-							démo.
-						</p>
+						{isOwner ? (
+							<div className="badge badge-outline mt-5 w-full py-3">
+								Votre prompt
+							</div>
+						) : hasAccess ? (
+							<div className="alert alert-success mt-5 py-3 text-sm">
+								<CheckCircle2 className="size-4" />
+								Déjà débloqué
+							</div>
+						) : (
+							<button
+								type="button"
+								className="btn btn-primary mt-5 w-full"
+								disabled={createCheckoutSession.isPending}
+								onClick={() => void handleBuyClick()}
+							>
+								{createCheckoutSession.isPending ? (
+									<span className="loading loading-spinner loading-sm" />
+								) : (
+									<ShoppingCart className="size-4" />
+								)}
+								Acheter
+							</button>
+						)}
 
 						<ul className="mt-5 space-y-2 border-t border-base-content/10 pt-4 text-xs text-base-content/60">
 							<li>• Texte du prompt copiable</li>

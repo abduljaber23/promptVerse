@@ -19,6 +19,7 @@ import { AiToolsModule } from './modules/ai-tools/ai-tools.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { PromptsModule } from './modules/prompts/prompts.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { PurchasesModule } from './modules/purchases/purchases.module';
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { AdminModule } from './modules/admin/admin.module';
     CategoriesModule,
     PromptsModule,
     AdminModule,
+    PurchasesModule,
   ],
   providers: [
     {

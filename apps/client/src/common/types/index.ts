@@ -19,6 +19,8 @@ export interface CurrentUser {
 	username: string;
 	email: string;
 	isEmailVerified: boolean;
+	/** Solde vendeur cumulé (ventes de prompts), en euros. */
+	balance: string;
 	lastLoginAt: string | null;
 	profile: UserProfile | null;
 	createdAt: string;
@@ -78,14 +80,17 @@ export interface PreviewImage {
 
 /**
  * Prompt tel que renvoyé par l'API. Les endpoints liste ne chargent PAS
- * les relations (seller/category/aiTool) : seuls les `*Id` sont présents.
- * `GET /prompts/:slug` ajoute `previewImages`.
+ * les relations (seller/category/aiTool) : seuls les `*Id` sont présents,
+ * et `promptContent` est absent (jamais renvoyé sur les vues liste, payant).
+ * `GET /prompts/:slug` ajoute `previewImages`, `promptContent` (`null` si non
+ * acheté/non propriétaire) et `isPurchasedByCurrentUser`.
  */
 export interface Prompt {
 	id: string;
 	title: string;
 	slug: string;
-	promptContent: string;
+	/** Absent sur les vues liste ; `null` si non débloqué sur `GET /prompts/:slug`. */
+	promptContent?: string | null;
 	previewResult: string | null;
 	coverImage: string | null;
 	price: string;
@@ -102,6 +107,33 @@ export interface Prompt {
 	categoryId: string;
 	aiToolId: string;
 	previewImages?: PreviewImage[];
+	/** Présent seulement sur `GET /prompts/:slug`. */
+	isPurchasedByCurrentUser?: boolean;
+}
+
+/* ------------------------------------------------------------------ */
+/* Achats                                                              */
+/* ------------------------------------------------------------------ */
+
+export type PurchaseStatus = "PENDING" | "COMPLETED" | "FAILED";
+
+/** Achat d'un prompt (paiement Stripe). `prompt` est toujours chargé. */
+export interface Purchase {
+	id: string;
+	buyerId: string;
+	promptId: string;
+	sellerId: string;
+	amount: string;
+	stripeCheckoutSessionId: string;
+	stripePaymentIntentId: string | null;
+	status: PurchaseStatus;
+	createdAt: string;
+	updatedAt: string;
+	prompt: Prompt;
+}
+
+export interface CreateCheckoutSessionResponse {
+	url: string;
 }
 
 /* ------------------------------------------------------------------ */

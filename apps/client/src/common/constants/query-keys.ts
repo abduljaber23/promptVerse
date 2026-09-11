@@ -29,4 +29,9 @@ export const queryKeys = {
 		users: ["admin", "users"] as const,
 		usersCount: ["admin", "users", "count"] as const,
 	},
+	purchases: {
+		mine: ["purchases", "mine"] as const,
+		bySession: (sessionId: string) =>
+			["purchases", "session", sessionId] as const,
+	},
 } as const;

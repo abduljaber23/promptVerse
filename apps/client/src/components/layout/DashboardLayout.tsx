@@ -3,6 +3,7 @@ import {
 	LayoutDashboard,
 	PlusCircle,
 	Settings,
+	ShoppingBag,
 } from "lucide-react";
 import { cn } from "@/common/lib/cn";
 import { Container } from "./Container";
@@ -13,6 +14,12 @@ const ITEMS = [
 		to: "/dashboard/prompts/new",
 		label: "Vendre un prompt",
 		icon: PlusCircle,
+		end: false,
+	},
+	{
+		to: "/dashboard/purchases",
+		label: "Mes achats",
+		icon: ShoppingBag,
 		end: false,
 	},
 	{ to: "/dashboard/settings", label: "Paramètres", icon: Settings, end: false },

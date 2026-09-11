@@ -14,6 +14,8 @@ import { PromptsService } from './prompts.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { jwtPayloadType } from '../../common/enums/user.enum';
 import { Public } from '../../common/decorators/public.decorator';
+import { OptionalAuth } from '../../common/decorators/optional-auth.decorator';
+import { OptionalCurrentUser } from '../../common/decorators/optional-current-user.decorator';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { CreatePromptDto } from './dto/create-prompt.dto';
@@ -70,9 +72,12 @@ export class PromptsController {
   }
 
   @Get(':slug')
-  @Public()
-  findOneBySlug(@Param('slug') slug: string) {
-    return this.promptsService.findOneBySlug(slug);
+  @OptionalAuth()
+  findOneBySlug(
+    @Param('slug') slug: string,
+    @OptionalCurrentUser() payload: jwtPayloadType | undefined,
+  ) {
+    return this.promptsService.findOneBySlug(slug, payload?.sub);
   }
 
   @Get('category/:categorySlug')

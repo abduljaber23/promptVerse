@@ -40,18 +40,31 @@ export function DashboardPage() {
 						</p>
 					</div>
 				</div>
-				<Link
-					to="/dashboard/prompts/new"
-					className="btn btn-primary btn-sm"
-				>
-					<PlusCircle className="size-4" />
-					Vendre un prompt
-				</Link>
+				<div className="flex gap-2">
+					<Link
+						to="/dashboard/purchases"
+						className="btn btn-ghost btn-sm"
+					>
+						<ShoppingBag className="size-4" />
+						Mes achats
+					</Link>
+					<Link
+						to="/dashboard/prompts/new"
+						className="btn btn-primary btn-sm"
+					>
+						<PlusCircle className="size-4" />
+						Vendre un prompt
+					</Link>
+				</div>
 			</header>
 
-			<div className="grid gap-4 sm:grid-cols-3">
+			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 				<StatCard label="Prompts publiés" value={published} />
 				<StatCard label="Ventes cumulées" value={totalSales} />
+				<StatCard
+					label="Solde disponible"
+					value={user ? formatPrice(user.balance) : "—"}
+				/>
 				<StatCard
 					label="E-mail vérifié"
 					value={user?.isEmailVerified ? "Oui" : "Non"}

@@ -199,6 +199,7 @@ export class UsersService {
       username: user.username,
       email: user.email,
       isEmailVerified: user.isEmailVerified,
+      balance: user.balance,
       lastLoginAt: user.lastLoginAt,
       profile: user.profile
         ? {

@@ -9,6 +9,7 @@ import { GuestRoute } from "@/components/auth/GuestRoute";
 import { HomePage } from "@/pages/HomePage";
 import { CatalogPage } from "@/pages/CatalogPage";
 import { PromptDetailPage } from "@/pages/PromptDetailPage";
+import { PurchaseSuccessPage } from "@/pages/PurchaseSuccessPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 
 import { LoginPage } from "@/pages/auth/LoginPage";
@@ -19,6 +20,7 @@ import { VerifyEmailPage } from "@/pages/auth/VerifyEmailPage";
 
 import { DashboardPage } from "@/pages/dashboard/DashboardPage";
 import { CreatePromptPage } from "@/pages/dashboard/CreatePromptPage";
+import { MyPurchasesPage } from "@/pages/dashboard/MyPurchasesPage";
 import { SettingsPage } from "@/pages/dashboard/SettingsPage";
 
 import { AdminUsersPage } from "@/pages/admin/AdminUsersPage";
@@ -34,11 +36,20 @@ export function AppRoutes() {
 				<Route path="prompts/:slug" element={<PromptDetailPage />} />
 
 				<Route element={<ProtectedRoute />}>
+					<Route
+						path="purchases/success"
+						element={<PurchaseSuccessPage />}
+					/>
+
 					<Route path="dashboard" element={<DashboardLayout />}>
 						<Route index element={<DashboardPage />} />
 						<Route
 							path="prompts/new"
 							element={<CreatePromptPage />}
+						/>
+						<Route
+							path="purchases"
+							element={<MyPurchasesPage />}
 						/>
 						<Route path="settings" element={<SettingsPage />} />
 					</Route>

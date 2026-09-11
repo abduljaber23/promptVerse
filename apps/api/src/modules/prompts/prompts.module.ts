@@ -2,6 +2,7 @@ import { PromptsService } from './prompts.service';
 import { PromptsController } from './prompts.controller';
 import { BadRequestException, Module } from '@nestjs/common';
 import { Prompt } from './entities/prompt.entity';
+import { Purchase } from '../purchases/entities/purchase.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CategoriesModule } from '../categories/categories.module';
 import { AiToolsModule } from '../ai-tools/ai-tools.module';
@@ -12,7 +13,7 @@ import { ErrorCodes } from '../../common/errors/error-codes';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Prompt]),
+    TypeOrmModule.forFeature([Prompt, Purchase]),
     MulterModule.register({
       fileFilter: (req, file, cb) => {
         if (file.mimetype.startsWith('image')) {
@@ -35,6 +36,6 @@ import { ErrorCodes } from '../../common/errors/error-codes';
   ],
   controllers: [PromptsController],
   providers: [PromptsService],
-  exports: [],
+  exports: [PromptsService],
 })
 export class PromptsModule {}
