@@ -28,6 +28,9 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY --from=deps  /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
+# Sous-dossiers vides (avatars/prompt-covers/prompt-previews) qui amorcent le
+# volume `uploads_data` (docker-compose) au premier démarrage.
+COPY --chown=node:node uploads ./uploads
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 

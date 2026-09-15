@@ -142,7 +142,6 @@ jobs:
           push: true
           build-args: |
             VITE_API_URL=/api/v1
-            VITE_ASSETS_URL=https://promptverse.biz/storage/prompt-verse
           tags: |
             ${{ env.FRONTEND_IMAGE }}:latest
             ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }}

@@ -10,11 +10,9 @@ RUN npm ci
 
 COPY . .
 
-# Variables injectées dans le bundle statique au build.
+# Variable injectée dans le bundle statique au build.
 ARG VITE_API_URL=/api/v1
-ARG VITE_ASSETS_URL=http://localhost:8333/prompt-verse
-ENV VITE_API_URL=$VITE_API_URL \
-    VITE_ASSETS_URL=$VITE_ASSETS_URL
+ENV VITE_API_URL=$VITE_API_URL
 
 RUN npm run build
 

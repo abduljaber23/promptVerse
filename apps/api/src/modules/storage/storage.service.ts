@@ -1,113 +1,26 @@
-import {
-  Injectable,
-  Logger,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
-import { ErrorCodes } from '../../common/errors/error-codes';
-import { ConfigService } from '@nestjs/config';
-import {
-  S3Client,
-  PutObjectCommand,
-  DeleteObjectCommand,
-  GetObjectCommand,
-} from '@aws-sdk/client-s3';
-import { randomUUID } from 'crypto';
-import { extname } from 'path';
-import 'multer';
-import { StorageFolder } from '../../common/enums/storage-folder.enum';
+import { Injectable, Logger } from '@nestjs/common';
+import { promises as fs } from 'fs';
+import { join } from 'path';
 
+/**
+ * Les fichiers uploadés (avatars, couvertures/aperçus de prompts) sont écrits
+ * directement sur disque par Multer (`diskStorage`, voir `users.module.ts` /
+ * `prompts.module.ts`) et servis par `StorageController`. Ce service ne gère
+ * que leur suppression — `key` est toujours une valeur qu'on a nous-mêmes
+ * écrite en base (`folder/nom-de-fichier`), jamais une entrée utilisateur.
+ */
 @Injectable()
 export class StorageService {
-  private s3Client: S3Client;
   private readonly logger = new Logger(StorageService.name);
-  private readonly bucket: string;
-
-  constructor(private configService: ConfigService) {
-    this.bucket = this.configService.get<string>('AWS_S3_BUCKET')!;
-    this.s3Client = new S3Client({
-      region: this.configService.get<string>('AWS_REGION') || 'us-east-1',
-      endpoint: this.configService.get<string>('AWS_S3_ENDPOINT'),
-      forcePathStyle: true,
-      credentials: {
-        accessKeyId: this.configService.get<string>('AWS_ACCESS_KEY_ID')!,
-        secretAccessKey: this.configService.get<string>(
-          'AWS_SECRET_ACCESS_KEY',
-        )!,
-      },
-    });
-  }
-
-  async uploadFile(
-    file: Express.Multer.File,
-    folder: StorageFolder,
-  ): Promise<string> {
-    try {
-      const fileExtName = extname(file.originalname);
-      const key = `${folder}/${randomUUID()}${fileExtName}`;
-
-      const command = new PutObjectCommand({
-        Bucket: this.bucket,
-        Key: key,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-      });
-
-      await this.s3Client.send(command);
-
-      return key;
-    } catch (e) {
-      const error = e as Error;
-      this.logger.error(
-        `Error uploading file to S3: ${error.message}`,
-        error.stack,
-      );
-      throw new InternalServerErrorException({
-        code: ErrorCodes.FILE_UPLOAD_FAILED,
-      });
-    }
-  }
 
   async deleteFile(key: string): Promise<void> {
     try {
-      const command = new DeleteObjectCommand({
-        Bucket: this.bucket,
-        Key: key,
-      });
-
-      await this.s3Client.send(command);
+      await fs.unlink(join('uploads', key));
     } catch (e) {
-      const error = e as Error;
-      this.logger.error(
-        `Error deleting file from S3: ${error.message}`,
-        error.stack,
-      );
-      throw new InternalServerErrorException({
-        code: ErrorCodes.FILE_DELETE_FAILED,
-      });
-    }
-  }
+      const error = e as NodeJS.ErrnoException;
+      if (error.code === 'ENOENT') return; // déjà absent : pas une erreur
 
-  async getFile(key: string) {
-    try {
-      const command = new GetObjectCommand({
-        Bucket: this.bucket,
-        Key: key,
-      });
-
-      return await this.s3Client.send(command);
-    } catch (e) {
-      const error = e as Error;
-      if (error.name === 'NoSuchKey') {
-        throw new NotFoundException({
-          code: ErrorCodes.FILE_NOT_FOUND,
-        });
-      }
-      this.logger.error(
-        `Error getting file from S3: ${error.message}`,
-        error.stack,
-      );
-      throw error;
+      this.logger.error(`Error deleting file ${key}: ${error.message}`);
     }
   }
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { cn } from "@/common/lib/cn";
-import { resolveAvatarUrl } from "@/common/lib/assets";
+import { resolveAssetUrl } from "@/common/lib/assets";
 import { initials } from "@/common/lib/format";
 
 interface UserAvatarProps {
@@ -17,7 +17,7 @@ export function UserAvatar({
 	className,
 }: UserAvatarProps) {
 	const [failed, setFailed] = useState(false);
-	const url = resolveAvatarUrl(avatarKey);
+	const url = resolveAssetUrl(avatarKey);
 	const showImage = url && !failed;
 
 	return (

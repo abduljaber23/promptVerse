@@ -147,10 +147,9 @@ export class UsersService {
   async setProfileAvatar(userId: string, file: Express.Multer.File) {
     const user = await this.findByIdOrFail(userId);
 
-    const key = await this.storageService.uploadFile(
-      file,
-      StorageFolder.AVATARS,
-    );
+    // Multer a déjà écrit le fichier sur disque (voir `UsersModule`) ; on ne
+    // fait ici que construire la clé (`avatars/<nom-de-fichier>`) à stocker.
+    const key = `${StorageFolder.AVATARS}/${file.filename}`;
 
     if (!user.profile) {
       user.profile = new UserProfile();

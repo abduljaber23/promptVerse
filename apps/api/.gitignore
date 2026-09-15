@@ -52,5 +52,10 @@ pids
 *.seed
 *.pid.lock
 
+# Fichiers uploadés (stockage local, voir StorageModule) — on garde
+# l'arborescence (uploads/*/.gitkeep) mais pas le contenu uploadé.
+uploads/*/*
+!uploads/*/.gitkeep
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

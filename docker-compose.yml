@@ -19,18 +19,19 @@ services:
       DB_HOST: database
       DB_PORT: "3306"
       REDIS_URL: redis://redis:6379
-      AWS_S3_ENDPOINT: http://seaweedfs:8333
       SMTP_HOST: mailpit
       SMTP_PORT: "1025"
     ports:
       - "${API_PORT:-3000}:3000"
+    volumes:
+      # Fichiers uploadés (avatars, couvertures/aperçus de prompts) — stockage
+      # disque local, servi par l'API elle-même (voir StorageController).
+      - uploads_data:/app/uploads
     depends_on:
       database:
         condition: service_healthy
       redis:
         condition: service_healthy
-      seaweedfs-setup:
-        condition: service_completed_successfully
     restart: unless-stopped
 
   # ─────────────────────────── Client (React/nginx) ──────────────────────
@@ -40,7 +41,6 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_API_URL: ${VITE_API_URL:-/api/v1}
-        VITE_ASSETS_URL: ${VITE_ASSETS_URL:-http://localhost:8333/prompt-verse}
     image: promptverse/client:latest
     container_name: promptverse_client
     ports:
@@ -87,73 +87,6 @@ services:
       retries: 10
     restart: unless-stopped
 
-  # ────────────────────── SeaweedFS (stockage S3) ──────────────────────
-  # `weed server` tout-en-un (master + volume + filer + passerelle S3 :8333).
-  # La config S3 est générée au démarrage à partir des variables AWS_* :
-  #   - identité admin = mêmes clés que celles utilisées par l'API ;
-  #   - identité `anonymous` = lecture seule sur le bucket (VITE_ASSETS_URL).
-  seaweedfs:
-    image: chrislusf/seaweedfs:4.47
-    container_name: promptverse_seaweedfs
-    environment:
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-promptverse}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-promptverse_secret}
-      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-prompt-verse}
-    entrypoint:
-      - /bin/sh
-      - -c
-      - |
-        set -e
-        cat > /tmp/s3.json <<EOF
-        {
-          "identities": [
-            {
-              "name": "admin",
-              "credentials": [{ "accessKey": "$$AWS_ACCESS_KEY_ID", "secretKey": "$$AWS_SECRET_ACCESS_KEY" }],
-              "actions": ["Admin", "Read", "List", "Tagging", "Write"]
-            },
-            { "name": "anonymous", "actions": ["Read:$$AWS_S3_BUCKET"] }
-          ]
-        }
-        EOF
-        exec /entrypoint.sh server -ip=seaweedfs -ip.bind=0.0.0.0 \
-          -master.telemetry=false \
-          -s3 -s3.port=8333 -s3.config=/tmp/s3.json
-    ports:
-      - "${SEAWEEDFS_S3_PORT:-8333}:8333"
-    volumes:
-      - seaweedfs_data:/data
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8333/healthz"]
-      interval: 10s
-      timeout: 5s
-      retries: 12
-      start_period: 15s
-    restart: unless-stopped
-
-  # One-shot : crée le bucket s'il n'existe pas encore (idempotent).
-  seaweedfs-setup:
-    image: chrislusf/seaweedfs:4.47
-    container_name: promptverse_seaweedfs_setup
-    depends_on:
-      seaweedfs:
-        condition: service_healthy
-    environment:
-      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-prompt-verse}
-    entrypoint:
-      - /bin/sh
-      - -c
-      - |
-        set -e
-        if echo "s3.bucket.list" | weed shell -master=seaweedfs:9333 | grep -qw "$$AWS_S3_BUCKET"; then
-          echo "Bucket SeaweedFS déjà présent : $$AWS_S3_BUCKET"
-        else
-          echo "s3.bucket.create -name $$AWS_S3_BUCKET" | weed shell -master=seaweedfs:9333
-          echo "s3.bucket.list" | weed shell -master=seaweedfs:9333 | grep -qw "$$AWS_S3_BUCKET"
-          echo "Bucket SeaweedFS prêt : $$AWS_S3_BUCKET"
-        fi
-    restart: "no"
-
   # ─────────────────────────── Mailpit (SMTP dev) ─────────────────────────
   mailpit:
     image: axllent/mailpit:latest
@@ -176,7 +109,7 @@ services:
 
 volumes:
   mysql_data:
-  seaweedfs_data:
+  uploads_data:
   redis_data:
 
 networks:

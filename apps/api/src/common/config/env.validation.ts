@@ -70,15 +70,4 @@ export const envValidationSchema = Joi.object({
 
   // Swagger configuration
   SWAGGER_ENABLED: Joi.boolean().truthy('true').falsy('false').default(true),
-
-  // AWS / SeaweedFS (S3) configuration
-  AWS_REGION: Joi.string().default('us-east-1'),
-
-  AWS_ACCESS_KEY_ID: Joi.string().required(),
-
-  AWS_SECRET_ACCESS_KEY: Joi.string().required(),
-
-  AWS_S3_ENDPOINT: Joi.string().uri().required(),
-
-  AWS_S3_BUCKET: Joi.string().required(),
 });

@@ -22,14 +22,13 @@ npm run dev               # http://localhost:5173
 ```
 
 L'API doit tourner sur `http://localhost:3000` (voir `docker-compose.yml` à la racine :
-MySQL + Redis + SeaweedFS + Mailpit sont requis, et les migrations TypeORM doivent être jouées).
+MySQL + Redis + Mailpit sont requis, et les migrations TypeORM doivent être jouées).
 
 ### Variables d'environnement
 
 | Clé | Description |
 |---|---|
-| `VITE_API_URL` | URL de l'API avec préfixe + version (`.../api/v1`) |
-| `VITE_ASSETS_URL` | URL publique du bucket S3/SeaweedFS servant les covers & previews des prompts |
+| `VITE_API_URL` | URL de l'API avec préfixe + version (`.../api/v1`) — sert aussi les avatars/covers/previews (`/uploads/...`) |
 
 ## Structure
 
@@ -73,7 +72,7 @@ src/
   pleine est renvoyée.
 - Le **paiement Stripe n'existe pas encore côté API** : le bouton « Acheter » est désactivé
   et le `promptContent` est masqué visuellement sur la fiche.
-- Les images de prompts sont servies par le bucket (`VITE_ASSETS_URL`) ; en cas d'échec
+- Les images de prompts sont servies par l'API (`/uploads/...`) ; en cas d'échec
   de chargement, un placeholder dégradé s'affiche (`<Thumbnail>`).
 
 ## Scripts

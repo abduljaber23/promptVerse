@@ -4,38 +4,28 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
   Patch,
   Post,
-  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { Readable } from 'stream';
-import type { Express, Response } from 'express';
+import type { Express } from 'express';
 import { UsersService } from './users.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { jwtPayloadType } from '../../common/enums/user.enum';
 import { ApiBody, ApiConsumes, ApiSecurity } from '@nestjs/swagger';
-import { StorageService } from '../storage/storage.service';
-import { Public } from '../../common/decorators/public.decorator';
 import { ErrorCodes } from '../../common/errors/error-codes';
 import { AvatarUploadDto } from './dto/avatar-upload.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateUserDto } from './dto/update-user.dto';
-// import { CacheInterceptor } from '@nestjs/cache-manager';
 
-// @UseInterceptors(CacheInterceptor)
 @ApiSecurity('access_token')
 @Controller({
   path: 'users',
   version: '1',
 })
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly storageService: StorageService,
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @Get('me')
   me(@CurrentUser() payload: jwtPayloadType) {
@@ -76,25 +66,5 @@ export class UsersController {
   @Delete('avatar')
   removeProfileAvatar(@CurrentUser() payload: jwtPayloadType) {
     return this.usersService.removeProfileAvatar(payload.sub);
-  }
-
-  @Get('avatar/:filename')
-  @Public()
-  async showProfileAvatar(
-    @Param('filename') filename: string,
-    @Res() res: Response,
-  ) {
-    try {
-      const file = await this.storageService.getFile('avatars/' + filename);
-      if (file.ContentType) {
-        res.setHeader('Content-Type', file.ContentType);
-      }
-      if (file.ContentLength) {
-        res.setHeader('Content-Length', file.ContentLength.toString());
-      }
-      (file.Body as Readable).pipe(res);
-    } catch {
-      res.status(404).send('Not found');
-    }
   }
 }

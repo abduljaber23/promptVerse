@@ -202,34 +202,28 @@ export class PromptsService {
     const uploadedKeys: string[] = [];
 
     try {
+      // Multer a déjà écrit `file` et `createPromptDto.previewImages` sur
+      // disque (voir `PromptsModule`) ; on ne fait ici que construire les
+      // clés (`prompt-covers/<nom>`, `prompt-previews/<nom>`) à stocker.
       let coverImageKey: string | null = null;
 
       if (file) {
-        coverImageKey = await this.storageService.uploadFile(
-          file,
-          StorageFolder.PROMPT_COVERS,
-        );
-
+        coverImageKey = `${StorageFolder.PROMPT_COVERS}/${file.filename}`;
         uploadedKeys.push(coverImageKey);
       }
 
-      const previewImages = await Promise.all(
-        (createPromptDto.previewImages ?? []).map(
-          async (previewFile, index) => {
-            const previewKey = await this.storageService.uploadFile(
-              previewFile,
-              StorageFolder.PROMPT_PREVIEWS,
-            );
+      const previewImages = (createPromptDto.previewImages ?? []).map(
+        (previewFile, index) => {
+          const previewKey = `${StorageFolder.PROMPT_PREVIEWS}/${previewFile.filename}`;
 
-            uploadedKeys.push(previewKey);
+          uploadedKeys.push(previewKey);
 
-            const previewImage = new PreviewImage();
-            previewImage.url = previewKey;
-            previewImage.sortOrder = index + 1;
+          const previewImage = new PreviewImage();
+          previewImage.url = previewKey;
+          previewImage.sortOrder = index + 1;
 
-            return previewImage;
-          },
-        ),
+          return previewImage;
+        },
       );
 
       const prompt = this.promptsRepository.create({
