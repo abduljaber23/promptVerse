@@ -43,13 +43,6 @@ export const envValidationSchema = Joi.object({
   // Redis configuration
   REDIS_URL: Joi.string().uri().required(),
 
-  // OAuth configuration
-  GOOGLE_CLIENT_ID: Joi.string().optional(),
-
-  GOOGLE_CLIENT_SECRET: Joi.string().optional(),
-
-  GOOGLE_CALLBACK_URL: Joi.string().uri().optional(),
-
   // Stripe configuration
   STRIPE_SECRET_KEY: Joi.string().pattern(/^sk_/).required(),
 
