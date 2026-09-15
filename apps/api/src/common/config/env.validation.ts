@@ -71,7 +71,7 @@ export const envValidationSchema = Joi.object({
   // Swagger configuration
   SWAGGER_ENABLED: Joi.boolean().truthy('true').falsy('false').default(true),
 
-  // AWS / MinIO configuration
+  // AWS / SeaweedFS (S3) configuration
   AWS_REGION: Joi.string().default('us-east-1'),
 
   AWS_ACCESS_KEY_ID: Joi.string().required(),

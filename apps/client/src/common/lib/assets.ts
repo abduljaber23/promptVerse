@@ -1,12 +1,12 @@
 import { API_BASE_URL } from "@/common/api/client";
 
 const ASSETS_URL = (
-	import.meta.env.VITE_ASSETS_URL ?? "http://localhost:9000/prompt_verse"
+	import.meta.env.VITE_ASSETS_URL ?? "http://localhost:8333/prompt-verse"
 ).replace(/\/$/, "");
 
 /**
  * Résout une clé de stockage (`prompt-covers/xxx.png`, `prompt-previews/xxx.jpg`)
- * en URL affichable. Les objets sont servis directement par le bucket S3 / MinIO.
+ * en URL affichable. Les objets sont servis directement par le bucket S3 / SeaweedFS.
  * Renvoie `null` si aucune clé — le composant affichera alors un placeholder.
  */
 export function resolveAssetUrl(key: string | null | undefined): string | null {

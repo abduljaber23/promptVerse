@@ -22,14 +22,14 @@ npm run dev               # http://localhost:5173
 ```
 
 L'API doit tourner sur `http://localhost:3000` (voir `docker-compose.yml` à la racine :
-MySQL + Redis + MinIO + Mailpit sont requis, et les migrations TypeORM doivent être jouées).
+MySQL + Redis + SeaweedFS + Mailpit sont requis, et les migrations TypeORM doivent être jouées).
 
 ### Variables d'environnement
 
 | Clé | Description |
 |---|---|
 | `VITE_API_URL` | URL de l'API avec préfixe + version (`.../api/v1`) |
-| `VITE_ASSETS_URL` | URL publique du bucket S3/MinIO servant les covers & previews des prompts |
+| `VITE_ASSETS_URL` | URL publique du bucket S3/SeaweedFS servant les covers & previews des prompts |
 
 ## Structure
 

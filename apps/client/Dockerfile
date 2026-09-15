@@ -12,7 +12,7 @@ COPY . .
 
 # Variables injectées dans le bundle statique au build.
 ARG VITE_API_URL=/api/v1
-ARG VITE_ASSETS_URL=http://localhost:9000/prompt_verse
+ARG VITE_ASSETS_URL=http://localhost:8333/prompt-verse
 ENV VITE_API_URL=$VITE_API_URL \
     VITE_ASSETS_URL=$VITE_ASSETS_URL
 

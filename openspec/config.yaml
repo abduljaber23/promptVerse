@@ -9,7 +9,7 @@ context: |
     - Backend: NestJS (TypeScript), TypeORM, MySQL 8.0
     - Auth: Custom JWT + bcrypt (Natif NestJS, sans Passport, sans OAuth)
     - Cache & Performance: Redis (TTL 5 min sur le catalogue)
-    - Storage: S3 / MinIO (Stockage des images PreviewImage)
+    - Storage: S3 / SeaweedFS (Stockage des images PreviewImage)
     - Payments: Stripe Checkout (Achats) + Stripe Connect (Versements Payouts)
     - Mails: Nodemailer / Mailpit (Dev) / Brevo (Prod)
     - Frontend: React (TypeScript) + Vite + Tailwind CSS (Dark Mode)
