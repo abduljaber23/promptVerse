@@ -240,7 +240,7 @@ export class AuthService {
     verificationToken: string,
   ): string {
     const clientUrl = this.config.getOrThrow<string>('CLIENT_URL');
-    return `${clientUrl}/api/v1/auth/verify-email/${userId}/${verificationToken}`;
+    return `${clientUrl}/verify-email/${userId}/${verificationToken}`;
   }
 
   private generateAccessToken(payload: jwtPayloadType): Promise<string> {
