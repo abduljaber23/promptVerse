@@ -6,6 +6,7 @@ Ce dossier contient votre kit de révision complet pour défendre le projet **Pr
 
 ## 🗂️ Sommaire du Kit d'Oral
 
+* 🎤 **[presentation.md](file:///c:/FormationCDA/projet_final/PromptVerse/docs/oral_cda/presentation.md)** — *Présentation du site : c'est quoi, fonctionnalités, stack technique.*
 * 📖 **[vocabulaire_cda.md](file:///c:/FormationCDA/projet_final/PromptVerse/docs/oral_cda/vocabulaire_cda.md)** — *Dictionnaire des 20 mots techniques indispensables (définition simple + exemple exact dans votre code).*
 * 📄 **[auth.md](file:///c:/FormationCDA/projet_final/PromptVerse/docs/oral_cda/auth.md)** — *Module Authentification & Sécurité (`register`, `verifyEmail`, `BcryptService`, sanitization, tokens, codes HTTP).*
 * 📄 **[users.md](file:///c:/FormationCDA/projet_final/PromptVerse/docs/oral_cda/users.md)** — *Module Utilisateurs & Entités (`UsersService`, entités `User`/`UserProfile`/`SocialLink`, UUIDs, Soft Delete, `@Exclude()`).*

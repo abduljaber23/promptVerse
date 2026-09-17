@@ -1,189 +1,344 @@
-# 📖 Dictionnaire du Vocabulaire CDA — 30 Termes Indispensables (PromptVerse)
+# Vocabulaire CDA — Questions/Réponses
 
-Ce document répertorie **les 30 mots et concepts techniques indispensables** de votre projet **PromptVerse**, avec pour chacun une **définition simple, directe et facile à retenir**.
+Format à réviser : question du jury → réponse générique (définition valable pour n'importe quel projet, pas juste celui-ci).
 
----
+## Général / Méthodo
 
-### 1. Injection de Dépendances (Dependency Injection / IoC)
-* **Définition simple :** Attendre qu'un outil vous soit fourni automatiquement dans le constructeur au lieu de le fabriquer vous-même avec `new`.
-* **Dans votre code :** NestJS injecte automatiquement `UsersService`, `BcryptService` et `MailService` dans `AuthService`.
+**C'est quoi une API ?**
+Un ensemble de points d'entrée (endpoints) qui permettent à deux applications de communiquer entre elles.
 
----
+**C'est quoi une API REST ?**
+Une API qui organise les échanges autour de ressources (ex: `/products`, `/users`) et des verbes HTTP (GET, POST, PATCH, DELETE) pour agir dessus.
 
-### 2. Principe de Responsabilité Unique (SRP - Single Responsibility Principle)
-* **Définition simple :** Chaque fichier ou classe doit faire une seule chose et la faire bien.
-* **Dans votre code :** `AuthService` gère la sécurité, `MailService` les e-mails, et `StorageService` le stockage S3.
+**C'est quoi un endpoint ?**
+Une URL précise exposée par une API, associée à une action (ex: `POST /login`).
 
----
+**C'est quoi le CRUD ?**
+Les 4 opérations de base sur une donnée : Create, Read, Update, Delete.
 
-### 3. Découplage (Loose Coupling)
-* **Définition simple :** Rendre les parties du code indépendantes les unes des autres pour pouvoir en remplacer une sans tout casser.
-* **Dans votre code :** Si vous remplacez `bcrypt` par `argon2`, vous modifiez seulement `BcryptService`, pas `AuthService`.
+**C'est quoi un framework ?**
+Une structure imposée qui organise le code et impose des conventions, contrairement à une simple librairie qu'on appelle librement à la demande.
 
----
+**C'est quoi l'architecture client-serveur ?**
+Le client (navigateur, application mobile) envoie des requêtes, le serveur les traite et renvoie une réponse.
 
-### 4. DTO (Data Transfer Object)
-* **Définition simple :** Un objet modèle qui définit et valide les données envoyées par l'utilisateur lors d'une requête HTTP.
-* **Dans votre code :** `RegisterDto` vérifie que l'email est valide (`@IsEmail`) et que le mot de passe fait au moins 6 caractères (`@MinLength(6)`).
+**C'est quoi une architecture 3-tiers ?**
+Trois couches séparées : présentation (interface), logique métier (traitement), données (stockage), chacune pouvant évoluer indépendamment des autres.
 
----
+**C'est quoi le versioning avec Git ?**
+Suivre l'historique des modifications du code, travailler à plusieurs sans écraser le travail des autres (branches, commits, fusion).
 
-### 5. Hachage Unidirectionnel (Hashing)
-* **Définition simple :** Transformer un mot de passe en une empreinte de caractères irréversible. On ne peut jamais revenir au mot de passe d'origine.
-* **Dans votre code :** `bcrypt.hash(password, 10)` transforme `"SecurePassword123"` en un hash illisible.
+**C'est quoi Docker / la conteneurisation ?**
+Faire tourner une application (et ses dépendances) isolée dans un environnement reproductible, identique quel que soit la machine sur laquelle elle s'exécute.
 
----
+**C'est quoi une variable d'environnement ?**
+Une valeur de configuration (clé secrète, URL, mot de passe) séparée du code source, qui peut changer entre développement et production sans toucher au code.
 
-### 6. Sel et Facteur de Coût (Salt Rounds)
-* **Définition simple :** Le "sel" est une donnée aléatoire ajoutée au mot de passe, et le "facteur de coût" est le nombre de fois où l'on répète le hachage pour ralentir les hackers.
-* **Dans votre code :** Le `10` dans `bcrypt.hash(password, 10)` effectue 1024 tours de calcul pour bloquer la force brute.
+**C'est quoi le protocole HTTP ?**
+Le protocole de communication du web : le client envoie une requête (méthode + URL + éventuellement des données), le serveur renvoie une réponse (statut + données).
 
----
+**Quelle est la différence entre HTTP et HTTPS ?**
+HTTPS ajoute un chiffrement (TLS/SSL) des échanges entre le client et le serveur, pour empêcher qu'un tiers les lise ou les modifie.
 
-### 7. CSPRNG (Générateur d'Aléatoire Cryptographique)
-* **Définition simple :** Un outil qui génère du vrai hasard impossible à deviner par un ordinateur ou un attaquant.
-* **Dans votre code :** `randomBytes(32)` génère les tokens de vérification et de reset mot de passe.
+**Quelle est la différence entre GET et POST ?**
+GET récupère une ressource sans la modifier (paramètres dans l'URL) ; POST envoie des données pour créer ou modifier une ressource (dans le corps de la requête).
 
----
+**C'est quoi le format JSON ?**
+Un format texte léger pour structurer des données (objets, listes) échangées entre un client et un serveur.
 
-### 8. Token à Usage Unique (Single-use Token)
-* **Définition simple :** Un jeton secret jetable qui ne peut servir qu'une seule fois.
-* **Dans votre code :** Dès que l'email est validé, `verificationToken` repasse à `null` pour empêcher toute réutilisation.
+**C'est quoi le principe "stateless" d'une API REST ?**
+Le serveur ne garde pas en mémoire l'état d'une session entre deux requêtes ; chaque requête doit contenir tout ce qui est nécessaire pour être traitée.
 
----
+**C'est quoi le CORS ?**
+Un mécanisme de sécurité du navigateur qui bloque par défaut les requêtes entre deux origines différentes, sauf autorisation explicite du serveur appelé.
 
-### 9. Sanitization (Nettoyage de Données)
-* **Définition simple :** Nettoyer les données saisies par l'utilisateur (retirer les espaces, passer en minuscules) avant de les traiter.
-* **Dans votre code :** `email.toLowerCase().trim()` nettoie l'adresse email lors de l'inscription et du login.
+**C'est quoi une fonction asynchrone (async/await) ?**
+Une manière d'écrire du code qui attend le résultat d'une opération longue (requête réseau, base de données) sans bloquer le reste du programme.
 
----
+**C'est quoi une Promise en JavaScript ?**
+Un objet qui représente le résultat futur d'une opération asynchrone (en attente, réussie ou échouée).
 
-### 10. ORM (Object-Relational Mapping) & Repository
-* **Définition simple :** Un outil qui permet de manipuler les tables de la base de données directement sous forme d'objets TypeScript sans écrire de SQL brut.
-* **Dans votre code :** TypeORM et `this.usersRepository.findOne()` ou `save()`.
+**C'est quoi TypeScript, et pourquoi l'utiliser plutôt que JavaScript ?**
+Un langage qui ajoute le typage statique à JavaScript ; il permet de détecter des erreurs (mauvais type, faute de frappe sur un champ) dès l'écriture du code plutôt qu'à l'exécution.
 
----
+**C'est quoi un package manager (ex: npm) ?**
+L'outil qui installe et gère les librairies utilisées par un projet, en gardant la liste de leurs versions.
 
-### 11. UUID v4 (Identifiant Unique Universel)
-* **Définition simple :** Un identifiant unique de 36 caractères imprédictible (ex: `550e8400-e29b-41d4-a716-446655440000`) qui remplace les IDs classiques `1, 2, 3...`.
-* **Dans votre code :** `@PrimaryGeneratedColumn('uuid')` sur l'entité `User`.
+**C'est quoi le semantic versioning (semver) ?**
+Un format de numéro de version `MAJOR.MINOR.PATCH` qui indique si une mise à jour casse la compatibilité, ajoute une fonctionnalité, ou corrige un bug.
 
----
+**C'est quoi un monorepo ?**
+Un seul dépôt Git qui contient plusieurs applications liées (ex: un backend et un frontend) au lieu d'avoir un dépôt séparé pour chacune.
 
-### 12. Soft Delete (Suppression Douce)
-* **Définition simple :** Masquer un utilisateur en enregistrant la date de suppression au lieu d'effacer définitivement la ligne dans la base de données.
-* **Dans votre code :** `@DeleteDateColumn()` remplit le champ `deletedAt`.
+**C'est quoi une méthode Agile / Scrum ?**
+Une méthode de gestion de projet qui découpe le travail en itérations courtes, avec des livrables réguliers plutôt qu'un seul livrable à la toute fin.
 
----
+**C'est quoi un sprint ?**
+Une période fixe (ex: 1 à 2 semaines) pendant laquelle une équipe réalise un lot de fonctionnalités défini à l'avance.
 
-### 13. Suppression en Cascade (`ON DELETE CASCADE`)
-* **Définition simple :** Supprimer automatiquement les données liées (ex: le profil) si l'élément parent (l'utilisateur) est supprimé.
-* **Dans votre code :** La relation `@OneToOne` entre `User` et `UserProfile`.
+**C'est quoi un cahier des charges ?**
+Le document qui décrit les besoins, les fonctionnalités attendues et les contraintes d'un projet avant de commencer à coder.
 
----
+**C'est quoi le MCD / MLD / MPD (méthode Merise) ?**
+MCD = modèle conceptuel (entités et relations, sans détails techniques), MLD = modèle logique (tables et clés étrangères), MPD = modèle physique (le script SQL réel).
 
-### 14. Intégrité Référentielle
-* **Définition simple :** S'assurer que les liens entre les tables restent cohérents et qu'il n'y a pas de données "orphelines" dans la base.
-* **Dans votre code :** Les clés étrangères (`user_id` et `profile_id`) dans MySQL.
+**C'est quoi un diagramme de cas d'utilisation (UML) ?**
+Un schéma qui montre les actions possibles pour chaque type d'utilisateur sur un système.
 
----
+**C'est quoi un diagramme de séquence (UML) ?**
+Un schéma qui montre l'ordre chronologique des échanges entre les composants pour réaliser une action précise.
 
-### 15. Idempotence
-* **Définition simple :** Une fonction est idempotente si l'exécuter plusieurs fois de suite donne exactement le même résultat sans provoquer d'erreur.
-* **Dans votre code :** Si on clique 2 fois sur le lien de confirmation d'email, la 2ème fois indique simplement *"Email déjà vérifié"*.
+**Quelle est la différence entre un test unitaire et un test d'intégration ?**
+Le test unitaire vérifie une fonction isolée avec ses dépendances simulées ; le test d'intégration vérifie que plusieurs parties fonctionnent bien ensemble.
 
----
+**C'est quoi le TDD (Test-Driven Development) ?**
+Une pratique qui consiste à écrire le test avant le code qui doit le faire passer.
 
-### 16. Principe Fail-Fast
-* **Définition simple :** Arrêter immédiatement la fonction dès qu'une condition échoue pour économiser du temps et de la mémoire.
-* **Dans votre code :** Si l'email existe déjà, on lève une `ConflictException` avant de lancer le hachage `bcrypt`.
+**C'est quoi la dette technique ?**
+Le coût futur causé par des choix rapides ou imparfaits pris aujourd'hui (code non nettoyé, simplifications) qu'il faudra corriger plus tard.
 
----
+**C'est quoi le refactoring ?**
+Réécrire une partie du code pour la rendre plus claire ou plus simple, sans changer son comportement.
 
-### 17. Codes de Statut HTTP RESTful
-* **201 Created :** Ressource créée avec succès (ex: Inscription réussie).
-* **400 Bad Request :** Données invalides ou token expiré.
-* **401 Unauthorized :** Identifiants incorrects ou token JWT manquant/invalide.
-* **403 Forbidden :** Accès interdit (email non vérifié ou rôle insuffisant).
-* **404 Not Found :** Ressource introuvable (ex: Utilisateur non trouvé).
-* **409 Conflict :** Conflit de donnée (ex: Email déjà utilisé).
-* **429 Too Many Requests :** Trop de requêtes envoyées (Rate Limiting).
-* **500 Internal Error :** Erreur technique du serveur (ex: Serveur mail en panne).
+**C'est quoi la scalabilité ?**
+La capacité d'une application à absorber plus de trafic ou de données sans perdre en performance.
 
----
+**Quelle est la différence entre un monolithe et des microservices ?**
+Le monolithe regroupe toute l'application dans un seul service déployé en bloc ; les microservices découpent l'application en plusieurs services indépendants qui communiquent entre eux.
 
-### 18. Cookie HTTP-Only (`httpOnly: true`)
-* **Définition simple :** Un cookie de navigateur inaccessible par le code JavaScript, ce qui le protège contre le vol par des pirates.
-* **Dans votre code :** `res.cookie('access_token', accessToken, { httpOnly: true, sameSite: 'lax' })` dans le login.
+**C'est quoi le RGPD ?**
+Le règlement européen sur la protection des données personnelles : il impose de sécuriser les données sensibles, de permettre leur suppression, et de ne collecter que ce qui est nécessaire.
+
+**C'est quoi l'accessibilité web (a11y) ?**
+Concevoir une interface utilisable par tous, y compris les personnes en situation de handicap (contraste suffisant, navigation au clavier, textes alternatifs).
 
 ---
 
-### 19. Anti-XSS (Cross-Site Scripting)
-* **Définition simple :** La protection contre l'injection de scripts malveillants dans le navigateur de l'utilisateur.
-* **Dans votre code :** Utilisation des cookies HTTP-Only au lieu du `localStorage` pour le token JWT.
+## Architecture Backend
+
+**C'est quoi l'injection de dépendances ?**
+Un mécanisme où le framework fournit automatiquement une instance d'un service à une classe qui en a besoin (souvent via le constructeur), au lieu qu'elle l'instancie elle-même avec `new`.
+
+**C'est quoi un module (au sens architecture applicative) ?**
+Une unité qui regroupe les éléments liés à un même domaine métier (controller, service, entités) pour structurer une grosse application en blocs indépendants.
+
+**C'est quoi un controller ?**
+La classe qui reçoit les requêtes HTTP entrantes et délègue le traitement au service approprié.
+
+**C'est quoi un service (au sens couche métier) ?**
+La classe qui contient la logique métier réelle, appelée par un controller, indépendante du protocole HTTP.
+
+**C'est quoi un DTO (Data Transfer Object) ?**
+Un objet qui décrit la forme et les règles de validation des données reçues dans une requête, avant qu'elles n'atteignent la logique métier.
+
+**C'est quoi un Guard ?**
+Une classe exécutée avant un controller qui autorise ou bloque l'accès à une route selon une condition (authentification, rôle...).
+
+**C'est quoi un Interceptor ?**
+Du code qui s'exécute autour du traitement d'une requête, pour transformer la requête entrante ou la réponse sortante (ex: retirer un champ sensible, mesurer un temps de traitement).
+
+**C'est quoi un décorateur personnalisé ?**
+Une annotation sur-mesure qui ajoute un comportement à une route ou extrait une donnée d'un paramètre, pour éviter de dupliquer du code dans chaque controller.
+
+**C'est quoi un Reflector (ou mécanisme de métadonnées) ?**
+Un outil qui permet de lire à l'exécution les informations posées par un décorateur, souvent utilisé dans un Guard pour adapter son comportement selon la route.
+
+**C'est quoi le principe de responsabilité unique (SRP) ?**
+Chaque classe ou module ne doit avoir qu'une seule responsabilité et une seule raison de changer.
+
+**C'est quoi le découplage ?**
+Réduire les dépendances directes entre les parties du code, pour pouvoir remplacer ou modifier l'une sans impacter les autres.
+
+**C'est quoi Swagger / OpenAPI ?**
+Un standard et un outil qui génèrent une documentation interactive d'une API à partir du code, permettant de tester les routes directement depuis un navigateur.
+
+**C'est quoi le rate limiting ?**
+Limiter le nombre de requêtes qu'un même client peut faire dans un temps donné, pour se protéger du brute-force ou d'une surcharge du serveur.
+
+**C'est quoi le versioning d'une API ?**
+Préfixer ou marquer les routes d'une API avec un numéro de version, pour pouvoir la faire évoluer sans casser les clients qui utilisent une version antérieure.
+
+**C'est quoi un pipe/mécanisme de validation global, et à quoi sert le "whitelisting" des champs ?**
+Un mécanisme qui valide automatiquement chaque requête entrante contre le schéma attendu. Le whitelisting retire ou rejette les champs non prévus dans ce schéma, pour éviter qu'un client envoie des données non désirées.
+
+**C'est quoi un contrôle d'accès basé sur les rôles (RBAC) ?**
+Restreindre l'accès à une fonctionnalité selon le rôle de l'utilisateur connecté (ex: utilisateur simple vs administrateur), vérifié côté serveur avant d'exécuter l'action.
+
+**C'est quoi un code d'erreur métier ?**
+Un identifiant stable et explicite renvoyé en plus du code HTTP, pour que le client puisse réagir précisément à un cas d'erreur sans avoir à analyser un message texte.
+
+**C'est quoi un health check ?**
+Une route qui vérifie que le service et ses dépendances critiques (base de données...) répondent correctement, utilisée par les outils de supervision ou d'orchestration.
+
+**C'est quoi le "raw body" d'une requête, et quand en a-t-on besoin ?**
+Le corps d'une requête conservé sous sa forme brute, non transformé — nécessaire quand un tiers doit vérifier une signature calculée sur les octets exacts envoyés (ex: la vérification d'un webhook).
+
+**C'est quoi exempter une route du rate limiting ?**
+Désactiver la limitation de requêtes sur une route précise, quand elle doit pouvoir recevoir légitimement beaucoup d'appels en peu de temps (ex: un service tiers qui notifie plusieurs événements d'affilée).
 
 ---
 
-### 20. ConfigService & 12-Factor App
-* **Définition simple :** Séparer le code de la configuration en lisant toutes les URLs et clés secrètes depuis le fichier `.env`.
-* **Dans votre code :** `this.config.getOrThrow('APP_URL')`.
+## Sécurité
+
+**C'est quoi un JWT (JSON Web Token) ?**
+Un jeton signé qui prouve l'identité d'un utilisateur, envoyé au client puis renvoyé à chaque requête pour prouver qu'il est connecté.
+
+**Pourquoi préférer un cookie HTTP-only au localStorage pour stocker un token ?**
+Un cookie HTTP-only n'est pas accessible en JavaScript, donc un script malveillant (XSS) ne peut pas voler le token.
+
+**C'est quoi le hachage (ex: bcrypt) ?**
+Transformer un mot de passe en une empreinte irréversible avant de le stocker en base, impossible à retrouver même si la base fuite.
+
+**C'est quoi le salt et le facteur de coût en hachage de mot de passe ?**
+Le salt est une donnée aléatoire ajoutée au mot de passe avant hachage ; le facteur de coût est le nombre de tours de calcul répétés pour ralentir volontairement le hachage et bloquer la force brute.
+
+**C'est quoi un token à usage unique ?**
+Un jeton qui devient invalide dès qu'il a servi une fois (ex: un lien de vérification ou de réinitialisation de mot de passe).
+
+**C'est quoi le XSS (Cross-Site Scripting) ?**
+Une attaque qui injecte du code malveillant exécuté dans le navigateur de la victime.
+
+**C'est quoi l'injection SQL ?**
+Une attaque qui insère du SQL malveillant dans une requête ; un ORM avec des requêtes préparées protège naturellement contre ce type d'attaque.
+
+**C'est quoi la sanitization ?**
+Nettoyer une donnée saisie par l'utilisateur (ex: retirer les espaces, mettre en minuscules) avant de la traiter ou de la stocker.
+
+**C'est quoi le CSRF ?**
+Une attaque qui fait exécuter une action à l'insu d'un utilisateur déjà connecté ; on s'en protège via un cookie `sameSite`, un token dédié, ou une vérification de l'origine de la requête.
+
+**C'est quoi les principaux codes de statut HTTP ?**
+201 = créé, 400 = données invalides, 401 = non authentifié, 403 = accès interdit, 404 = introuvable, 409 = conflit, 429 = trop de requêtes, 500 = erreur serveur.
+
+**C'est quoi un middleware de sécurité (ex: Helmet) ?**
+Un composant qui ajoute automatiquement des en-têtes HTTP de sécurité à chaque réponse (anti-clickjacking, anti-sniffing de type MIME, etc.).
+
+**C'est quoi le CORS avec "credentials" ?**
+Une configuration qui autorise explicitement une origine précise à faire des requêtes cross-origin en incluant les cookies, alors que par défaut le navigateur bloque cet envoi vers une origine non autorisée.
+
+**Quelle est la différence entre une route publique et une route à authentification optionnelle ?**
+Une route publique ignore totalement l'authentification. Une route à authentification optionnelle reste accessible sans connexion, mais identifie quand même l'utilisateur si un token valide est fourni.
+
+**C'est quoi la validation des variables d'environnement au démarrage ?**
+Un schéma qui vérifie que toutes les variables nécessaires sont présentes et valides avant que l'application ne démarre, pour échouer immédiatement plutôt que de planter plus tard en pleine requête.
+
+**C'est quoi le principe "fail-fast" ?**
+Vérifier les conditions bloquantes le plus tôt possible et arrêter immédiatement le traitement si l'une échoue, plutôt que de continuer un travail qui sera de toute façon annulé.
 
 ---
 
-### 21. Reflector (Métadonnées NestJS)
-* **Définition simple :** L'outil de NestJS qui permet de lire les informations cachées apportées par des décorateurs personnalisés (comme `@Public()` ou `@Roles()`).
-* **Dans votre code :** `this.reflector.getAllAndOverride(IS_PUBLIC_KEY, ...)` dans `AuthGuard`.
+## Base de données
+
+**C'est quoi un ORM ?**
+Un outil qui permet de manipuler les tables d'une base de données relationnelle comme des objets du langage de programmation, sans écrire de SQL brut.
+
+**C'est quoi une migration ?**
+Un fichier versionné qui décrit une modification du schéma de la base (création/modification de table), appliqué dans un ordre précis pour que toutes les instances de la base restent synchronisées.
+
+**C'est quoi un UUID ?**
+Un identifiant unique long et imprévisible, utilisé comme clé primaire à la place d'un simple entier auto-incrémenté.
+
+**C'est quoi le soft delete ?**
+Au lieu de supprimer une ligne, on remplit une colonne "date de suppression" pour la masquer sans perdre la donnée.
+
+**C'est quoi une clé étrangère ?**
+Une colonne qui référence l'ID d'une autre table (ex: l'ID de l'auteur dans une table d'articles), garantit la cohérence entre les tables.
+
+**C'est quoi une relation 1:1, 1:N, N:N ?**
+1:1 (un utilisateur a un seul profil), 1:N (un utilisateur peut passer plusieurs commandes), N:N (un produit peut appartenir à plusieurs catégories, et une catégorie contenir plusieurs produits).
+
+**C'est quoi l'intégrité référentielle ?**
+Le fait qu'il ne puisse pas exister de donnée "orpheline" : une ligne qui référence un ID qui n'existe plus.
+
+**C'est quoi un enum en base de données ?**
+Une colonne qui ne peut prendre qu'une liste fixe de valeurs (ex: un statut limité à "en attente"/"validé"/"refusé"), au lieu d'une chaîne de caractères libre.
+
+**C'est quoi une transaction SQL ?**
+Un ensemble d'opérations exécutées comme un bloc unique : soit toutes réussissent et sont validées, soit une échoue et tout est annulé, pour garantir la cohérence des données.
 
 ---
 
-### 22. Décorateur Personnalisé (Custom Decorator)
-* **Définition simple :** Une annotation créée sur-mesure pour simplifier l'extraction de données ou ajouter des règles sur une route.
-* **Dans votre code :** `@CurrentUser()` pour extraire l'utilisateur connecté et `@Public()` pour rendre une route accessible sans connexion.
+## Paiement en ligne
+
+**Comment se déroule un paiement avec une page de paiement hébergée (ex: Stripe Checkout) ?**
+Le client est redirigé vers une page de paiement gérée par le prestataire, paie, puis le prestataire notifie le serveur (webhook) qui valide la commande et débloque l'accès.
+
+**Pourquoi utiliser une page de paiement hébergée plutôt que de gérer la carte bancaire soi-même ?**
+Aucune donnée bancaire ne transite par son propre serveur, ce qui évite d'avoir à être conforme aux normes de sécurité bancaire (PCI-DSS) soi-même.
+
+**C'est quoi un webhook ?**
+Une notification qu'un service tiers envoie automatiquement à un serveur pour l'informer qu'un événement s'est produit (ex: un paiement réussi).
+
+**C'est quoi l'idempotence, appliquée à un webhook ?**
+Si le même événement est reçu plusieurs fois, le traitement ne doit pas être exécuté plusieurs fois ni créer de doublon.
+
+**Comment protéger un contenu payant après un achat ?**
+Le contenu sensible n'est renvoyé par l'API que si un achat validé existe en base pour cet utilisateur, vérifié côté serveur à chaque requête — jamais seulement caché ou désactivé côté interface.
+
+**Quels sont les statuts typiques d'une commande ?**
+En attente (créée mais pas encore payée), validée/complétée (paiement confirmé), échouée/annulée (paiement non abouti ou session expirée).
+
+**Pourquoi valider des règles métier côté serveur avant de déclencher un paiement ?**
+Pour éviter des cas incohérents (ex: acheter son propre produit, acheter deux fois le même article) : ces vérifications se font côté serveur, jamais seulement côté interface qui peut être contournée.
+
+**Comment gérer un produit gratuit dans un système de paiement ?**
+Un produit à prix nul ne doit jamais passer par le prestataire de paiement : il est débloqué directement côté serveur, sans création de session de paiement.
+
+**Pourquoi convertir un prix en centimes avant d'appeler un prestataire de paiement ?**
+La plupart des prestataires travaillent en plus petite unité de la devise (centimes), et manipuler des entiers évite les erreurs d'arrondi liées aux nombres flottants.
 
 ---
 
-### 23. Swagger & OpenAPI (`@ApiProperty` & `@ApiSecurity`)
-* **Définition simple :** Un outil qui génère automatiquement une documentation web interactive pour tester l'API.
-* **Dans votre code :** Accessible sur `http://localhost:3000/api/docs`.
+## Frontend
+
+**Quelle est la différence entre état serveur et état client ?**
+L'état serveur vient de l'API et doit rester synchronisé avec elle (cache, rechargement) ; l'état client est propre à l'interface (ex: ouverture d'un menu, un formulaire en cours de saisie).
+
+**C'est quoi une librairie de gestion d'état serveur (ex: TanStack Query) ?**
+Une librairie qui gère le chargement, le cache et la synchronisation des données venant d'une API, pour éviter de recoder un système de cache à la main.
+
+**C'est quoi une librairie de gestion d'état client global (ex: Zustand, Redux) ?**
+Une librairie qui centralise un état partagé entre plusieurs composants de l'interface (ex: l'utilisateur connecté, des notifications), sans avoir à le faire remonter manuellement de composant en composant.
+
+**C'est quoi un hook React ?**
+Une fonction réutilisable qui encapsule une logique liée à l'état ou au cycle de vie d'un composant.
+
+**C'est quoi la validation de formulaire avec un schéma (ex: Zod) ?**
+Un schéma qui décrit les règles attendues sur les champs d'un formulaire et rejette les données invalides avant l'envoi à l'API.
+
+**C'est quoi le routing côté client ?**
+Changer de page dans une application sans recharger tout le site, en gérant les URLs directement dans le navigateur.
+
+**C'est quoi le responsive design ?**
+Une interface qui s'adapte à toutes les tailles d'écran (mobile, tablette, desktop), souvent via des media queries ou un framework CSS utilitaire.
+
+**Comment protéger une page réservée aux utilisateurs connectés côté frontend ?**
+Un composant ou une garde de route vérifie le statut d'authentification avant d'afficher la page, et redirige vers la connexion sinon — cette protection reste un confort d'UX, la vraie sécurité est toujours revérifiée côté serveur.
+
+**C'est quoi une couche d'accès à l'API côté frontend ?**
+Un ensemble de fonctions qui centralisent tous les appels HTTP vers le backend, pour que les composants ne manipulent jamais directement le client HTTP et restent découplés du détail des routes.
 
 ---
 
-### 24. Throttling / Rate Limiting (`@Throttle`)
-* **Définition simple :** Limiter le nombre de requêtes qu'un utilisateur ou un bot peut faire dans un temps donné pour éviter le surmenage du serveur.
-* **Dans votre code :** `@Throttle()` sur `/register` et `/login` dans `AuthController`.
+## Infra / Déploiement
 
----
+**C'est quoi un reverse proxy ?**
+Un point d'entrée unique qui reçoit toutes les requêtes et les redirige vers le bon service selon l'URL, et gère souvent le HTTPS.
 
-### 25. Moteur de Templates Handlebars (`.hbs`)
-* **Définition simple :** Un outil qui permet de fabriquer des pages HTML (comme des e-mails) en y injectant dynamiquement des données TypeScript.
-* **Dans votre code :** `template: 'verify-email'` dans `MailService`.
+**C'est quoi Docker Compose ?**
+Un fichier qui décrit et démarre plusieurs conteneurs liés (application, base de données, proxy...) avec une seule commande.
 
----
+**C'est quoi Certbot / un certificat HTTPS ?**
+Un outil qui génère et renouvelle automatiquement un certificat SSL pour chiffrer les échanges entre le client et le serveur.
 
-### 26. Joi Schema Validation
-* **Définition simple :** Un outil de contrôle qui vérifie au démarrage de l'application que toutes les variables du fichier `.env` sont bien présentes et valides.
-* **Dans votre code :** `envValidationSchema` dans `common/config/env.validation.ts`.
+**Quelle est la différence entre un environnement de dev et de prod ?**
+Deux configurations différentes (base de données, clés secrètes, URLs) pour le même code, séparées via des fichiers de configuration distincts.
 
----
+**C'est quoi un pipeline de déploiement (CI/CD) ?**
+La suite d'étapes automatisées (build, tests, mise en ligne) qui envoie le code sur le serveur de production à chaque changement validé.
 
-### 27. ClassSerializerInterceptor
-* **Définition simple :** Un filtre NestJS global qui transforme les objets retournés par l'API en appliquant les règles d'exclusion de champs.
-* **Dans votre code :** `APP_INTERCEPTOR` dans `app.module.ts` pour appliquer `@Exclude()` sur le mot de passe.
+**C'est quoi un cache applicatif (ex: Redis) ?**
+Une base de données en mémoire très rapide, utilisée pour stocker temporairement des résultats coûteux à recalculer, des sessions, ou des files d'attente.
 
----
-
-### 28. MinIO & Mode Path-Style (`forcePathStyle: true`)
-* **Définition simple :** Un serveur de stockage de fichiers S3 compatible utilisé en local. `forcePathStyle: true` adapte les URLs du SDK AWS pour MinIO.
-* **Dans votre code :** `forcePathStyle: true` dans `StorageService`.
-
----
-
-### 29. Logger (Journalisation par Contexte)
-* **Définition simple :** Un outil d'enregistrement des messages et des erreurs du serveur à la place de `console.log`.
-* **Dans votre code :** `private readonly logger = new Logger(MailService.name)`.
-
----
-
-### 30. Message Queue (File d'Attente - BullMQ / Redis)
-* **Définition simple :** Une liste d'attente qui stocke des tâches lourdes (comme l'envoi d'emails) pour les exécuter en arrière-plan sans bloquer le serveur.
-* **Dans votre projet :** L'évolution recommandée pour la production.
+**C'est quoi un entrypoint de conteneur, et pourquoi y lancer les migrations ?**
+Le script exécuté au démarrage d'un conteneur avant l'application elle-même ; il sert souvent à appliquer les migrations de base de données en attente, pour garantir que le schéma est à jour avant que le service ne commence à traiter du trafic.
