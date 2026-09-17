@@ -24,6 +24,11 @@ services:
       REDIS_URL: redis://redis:6379
       SMTP_HOST: mailpit
       SMTP_PORT: "1025"
+      # Mêmes identifiants que le service `database` ci-dessous (root .env),
+      # pour ne pas les dupliquer séparément dans apps/api/.env.development.
+      DB_NAME: ${DB_NAME:-prompt_verse}
+      DB_USER: ${DB_USER:-promptverse}
+      DB_PASSWORD: ${DB_PASSWORD:-promptverse}
     ports:
       - "${API_PORT:-3000}:3000"
     volumes:
@@ -42,7 +47,7 @@ services:
       dockerfile: Dockerfile.dev
     container_name: promptverse_client
     ports:
-      - "5173:5173"
+      - "${CLIENT_PORT:-5173}:5173"
     volumes:
       - ./apps/client:/app
       - client_node_modules:/app/node_modules
