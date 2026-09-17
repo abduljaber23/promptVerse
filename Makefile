@@ -1,5 +1,11 @@
 dev:
-	docker compose up -d
+	docker compose -f docker-compose.dev.yml up -d --build
 
-logs_api:
-	docker compose logs -f api
+migrate:
+	docker compose -f docker-compose.dev.yml exec api npm run migration:run
+
+logs:
+	docker compose -f docker-compose.dev.yml logs -f
+
+down:
+	docker compose -f docker-compose.dev.yml down

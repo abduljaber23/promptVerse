@@ -28,12 +28,6 @@ export const envValidationSchema = Joi.object({
     .pattern(/^\d+(s|m|h|d)$/)
     .required(),
 
-  JWT_REFRESH_SECRET: Joi.string().min(32).required(),
-
-  JWT_REFRESH_EXPIRES_IN: Joi.string()
-    .pattern(/^\d+(s|m|h|d)$/)
-    .required(),
-
   // Client URL for CORS configuration
   CLIENT_URL: Joi.string().uri().required(),
 
@@ -47,8 +41,6 @@ export const envValidationSchema = Joi.object({
   STRIPE_SECRET_KEY: Joi.string().pattern(/^sk_/).required(),
 
   STRIPE_WEBHOOK_SECRET: Joi.string().required(),
-
-  STRIPE_PUBLISHABLE_KEY: Joi.string().pattern(/^pk_/).required(),
 
   // SMTP configuration
   SMTP_FROM: Joi.string().email().required(),
