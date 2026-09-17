@@ -4,7 +4,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Inject,
   Param,
   Post,
   Res,
@@ -18,18 +17,13 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { Throttle } from '@nestjs/throttler';
 import { Public } from '../../common/decorators/public.decorator';
 import { ApiSecurity } from '@nestjs/swagger';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import type { Cache } from 'cache-manager';
 
 @Controller({
   path: 'auth',
   version: '1',
 })
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('register')
   @Throttle({
@@ -44,9 +38,7 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() registerDto: RegisterDto) {
-    const result = await this.authService.register(registerDto);
-    await this.cacheManager.del('users');
-    return result;
+    return this.authService.register(registerDto);
   }
 
   @Post('login')

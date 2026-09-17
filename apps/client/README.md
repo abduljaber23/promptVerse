@@ -21,8 +21,8 @@ npm install
 npm run dev               # http://localhost:5173
 ```
 
-L'API doit tourner sur `http://localhost:3000` (voir `docker-compose.yml` à la racine :
-MySQL + Redis + Mailpit sont requis, et les migrations TypeORM doivent être jouées).
+L'API doit tourner sur `http://localhost:3000` (voir `docker-compose.dev.yml` à la racine :
+MySQL + Mailpit sont requis, et les migrations TypeORM doivent être jouées).
 
 ### Variables d'environnement
 

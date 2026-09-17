@@ -6,7 +6,7 @@
 
 Je vais présenter la partie infrastructure du projet, c'est-à-dire tout ce qui permet de faire tourner et de livrer l'application.
 
-Toute l'application est containerisée avec Docker. On a plusieurs conteneurs qui communiquent entre eux : un pour le backend NestJS, un pour le frontend React, un pour la base de données MySQL, et un pour Redis. Redis est présent dans la stack et surveillé par un healthcheck, mais on ne l'exploite pas encore fonctionnellement dans le code — c'est une piste d'évolution qu'on assume.
+Toute l'application est containerisée avec Docker. On a plusieurs conteneurs qui communiquent entre eux : un pour le backend NestJS, un pour le frontend React, et un pour la base de données MySQL.
 
 En développement, on a un environnement complet lancé avec `docker compose up`, avec en plus un faux serveur SMTP local qui nous permet de voir les emails envoyés sans jamais en envoyer de vrais pendant qu'on développe.
 

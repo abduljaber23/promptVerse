@@ -11,8 +11,6 @@ import { AuthGuard } from './common/guards/auth.guard';
 import { CustomThrottlerGuard } from './common/guards/custom-throttler.guard';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { JwtModule, JwtSignOptions } from '@nestjs/jwt';
-import { CacheModule } from '@nestjs/cache-manager';
-import { createKeyv } from '@keyv/redis';
 import { StorageModule } from './modules/storage/storage.module';
 import { HealthModule } from './modules/health/health.module';
 import { AiToolsModule } from './modules/ai-tools/ai-tools.module';
@@ -63,14 +61,6 @@ import { PurchasesModule } from './modules/purchases/purchases.module';
         limit: 2000,
       },
     ]),
-    CacheModule.registerAsync({
-      isGlobal: true,
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        ttl: 10 * 60 * 1000,
-        stores: [createKeyv(config.getOrThrow<string>('REDIS_URL'))],
-      }),
-    }),
     HealthModule,
     UsersModule,
     AuthModule,
@@ -87,10 +77,6 @@ import { PurchasesModule } from './modules/purchases/purchases.module';
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
     },
-    // {
-    //   provide: APP_INTERCEPTOR,
-    //   useClass: CacheInterceptor,
-    // },
     {
       provide: APP_GUARD,
       useClass: AuthGuard,

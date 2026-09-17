@@ -10,13 +10,12 @@ L'application est découpée en plusieurs conteneurs Docker qui communiquent ent
 - **api** : backend NestJS
 - **client** : frontend React, servi par un nginx interne (build Vite)
 - **database** : MySQL 8.4
-- **redis** : présent dans la stack, healthcheck actif, mais pas encore réellement exploité par le code (piste d'évolution : cache, sessions, files d'attente de mails)
 - **mailpit** (dev uniquement) : faux serveur SMTP avec interface web pour voir les mails envoyés sans vrai envoi
 - **nginx** (prod uniquement) : reverse proxy d'edge, HTTPS
 
 ## Démarrage et migrations
 
-- `api` attend que `database` et `redis` soient "healthy" (healthchecks Docker Compose) avant de démarrer.
+- `api` attend que `database` soit "healthy" (healthcheck Docker Compose) avant de démarrer.
 - Au démarrage du conteneur `api`, `docker-entrypoint.sh` :
   1. attend que le port MySQL réponde,
   2. joue les migrations TypeORM (`typeorm migration:run`),
@@ -33,7 +32,7 @@ L'application est découpée en plusieurs conteneurs Docker qui communiquent ent
 ## Environnement de développement (`docker-compose.yml`)
 
 - `docker compose up --build` lance toute la stack en local.
-- Ports exposés directement sur la machine (API sur 3000, client sur 8080, MySQL, Redis, Mailpit UI sur 8025...).
+- Ports exposés directement sur la machine (API sur 3000, client sur 5173, MySQL, Mailpit UI sur 8025...).
 - Mailpit remplace un vrai serveur SMTP pendant le développement.
 
 ## Environnement de production (`docker-compose.prod.yml`)
@@ -66,4 +65,3 @@ Pipeline déclenché sur push vers la branche `deploy` :
 - Un seul VPS, tout est containerisé.
 - Pas de stockage objet externe : disque local + volume Docker, choix simple assumé pour la taille du projet.
 - Certbot tourne en natif sur l'hôte, pas en conteneur — c'est une source d'erreur classique à bien expliquer si on te pose la question (ordre de bootstrap : d'abord nginx en HTTP, puis génération du certificat, puis passage en HTTPS).
-- Redis est dans la stack mais pas encore utilisé fonctionnellement — à dire honnêtement si la question arrive.

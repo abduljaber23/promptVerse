@@ -7,7 +7,6 @@ name: promptverse
 #   docker compose -f docker-compose.dev.yml exec api npm run migration:run
 # Le build multi-stage de prod (images figées, pas de hot reload) est dans
 # docker-compose.prod.yml (images construites par la CI).
-# Outils optionnels (RedisInsight) :  docker compose -f docker-compose.dev.yml --profile tools up
 
 services:
   # ───────────────────────────── API (NestJS, hot reload) ─────────────────
@@ -21,7 +20,6 @@ services:
       # Couplages réseau imposés (doivent correspondre aux noms de services).
       DB_HOST: database
       DB_PORT: "3306"
-      REDIS_URL: redis://redis:6379
       SMTP_HOST: mailpit
       SMTP_PORT: "1025"
       # Mêmes identifiants que le service `database` ci-dessous (root .env),
@@ -36,8 +34,6 @@ services:
       - api_node_modules:/app/node_modules
     depends_on:
       database:
-        condition: service_healthy
-      redis:
         condition: service_healthy
 
   # ─────────────────────────── Client (Vite, hot reload) ──────────────────
@@ -75,22 +71,6 @@ services:
       start_period: 20s
     restart: unless-stopped
 
-  # ───────────────────────────── Redis ─────────────────────────────────
-  redis:
-    image: redis:7-alpine
-    container_name: promptverse_redis
-    command: ["redis-server", "--appendonly", "yes"]
-    ports:
-      - "${REDIS_PORT_HOST:-6379}:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 10
-    restart: unless-stopped
-
   # ─────────────────────────── Mailpit (SMTP dev) ─────────────────────────
   mailpit:
     image: axllent/mailpit:latest
@@ -100,20 +80,8 @@ services:
       - "${MAILPIT_UI_PORT:-8025}:8025"
     restart: unless-stopped
 
-  # ───────────────────── RedisInsight (profil "tools") ───────────────────
-  redisinsight:
-    image: redis/redisinsight:latest
-    container_name: promptverse_redisinsight
-    ports:
-      - "${REDISINSIGHT_PORT:-5540}:5540"
-    depends_on:
-      - redis
-    profiles: ["tools"]
-    restart: unless-stopped
-
 volumes:
   mysql_data:
-  redis_data:
   api_node_modules:
   client_node_modules:
 

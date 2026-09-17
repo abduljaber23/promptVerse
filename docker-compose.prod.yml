@@ -39,7 +39,6 @@ services:
       PORT: "3000"
       DB_HOST: database
       DB_PORT: "3306"
-      REDIS_URL: redis://redis:6379
     volumes:
       # Fichiers uploadés (avatars, couvertures/aperçus de prompts) — stockage
       # disque local, servi par l'API elle-même (voir StorageController) et
@@ -47,8 +46,6 @@ services:
       - uploads_data:/app/uploads
     depends_on:
       database:
-        condition: service_healthy
-      redis:
         condition: service_healthy
     restart: unless-stopped
 
@@ -80,24 +77,9 @@ services:
       start_period: 20s
     restart: unless-stopped
 
-  # ───────────────────────────── Redis ─────────────────────────────────
-  redis:
-    image: redis:7-alpine
-    container_name: promptverse_redis
-    command: ["redis-server", "--appendonly", "yes"]
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 10
-    restart: unless-stopped
-
 volumes:
   mysql_data:
   uploads_data:
-  redis_data:
 
 networks:
   default:

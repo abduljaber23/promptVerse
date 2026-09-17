@@ -34,9 +34,6 @@ export const envValidationSchema = Joi.object({
   // App URL for CORS configuration
   APP_URL: Joi.string().uri().required(),
 
-  // Redis configuration
-  REDIS_URL: Joi.string().uri().required(),
-
   // Stripe configuration
   STRIPE_SECRET_KEY: Joi.string().pattern(/^sk_/).required(),
 
