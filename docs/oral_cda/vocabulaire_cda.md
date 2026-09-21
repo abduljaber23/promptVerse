@@ -112,6 +112,27 @@ Le règlement européen sur la protection des données personnelles : il impose 
 **C'est quoi l'accessibilité web (a11y) ?**
 Concevoir une interface utilisable par tous, y compris les personnes en situation de handicap (contraste suffisant, navigation au clavier, textes alternatifs).
 
+**C'est quoi la programmation orientée objet (POO) ?**
+Une façon d'organiser le code autour d'objets qui regroupent des données et les comportements qui les manipulent, plutôt qu'une suite de fonctions séparées des données.
+
+**C'est quoi un design pattern ?**
+Une solution standard, reconnue et nommée, à un problème de conception qui revient souvent (ex: Singleton, Factory, Repository).
+
+**C'est quoi les principes SOLID ?**
+Cinq principes de conception orientée objet qui rendent un code plus facile à faire évoluer (responsabilité unique, ouvert/fermé, substitution de Liskov, ségrégation des interfaces, inversion des dépendances).
+
+**Quelle est la différence entre le rendu côté serveur (SSR) et côté client (CSR) ?**
+En SSR, le serveur génère le HTML déjà rempli avant de l'envoyer au navigateur ; en CSR, le navigateur reçoit une page presque vide et c'est le JavaScript qui construit le contenu après coup.
+
+**C'est quoi un runtime (ex: Node.js) ?**
+L'environnement qui exécute réellement le code (ici, du JavaScript en dehors du navigateur), avec accès au système de fichiers, au réseau, etc.
+
+**C'est quoi une revue de code (code review) ?**
+La relecture du code d'un collègue avant de l'intégrer, pour détecter des bugs, améliorer la lisibilité et partager la connaissance du projet dans l'équipe.
+
+**C'est quoi une user story ?**
+Une description courte d'un besoin utilisateur, souvent formulée "en tant que [rôle], je veux [action], afin de [bénéfice]", utilisée pour découper le travail en Agile.
+
 ---
 
 ## Architecture Backend
@@ -176,6 +197,21 @@ Le corps d'une requête conservé sous sa forme brute, non transformé — néce
 **C'est quoi exempter une route du rate limiting ?**
 Désactiver la limitation de requêtes sur une route précise, quand elle doit pouvoir recevoir légitimement beaucoup d'appels en peu de temps (ex: un service tiers qui notifie plusieurs événements d'affilée).
 
+**C'est quoi un middleware ?**
+Une fonction exécutée entre l'arrivée d'une requête et son traitement final, qui peut la modifier, la bloquer ou simplement l'observer (logs, headers de sécurité...).
+
+**C'est quoi l'inversion de contrôle (IoC) ?**
+Le principe où c'est le framework qui décide quand appeler le code de l'application (et lui fournit ses dépendances), plutôt que l'application qui pilote elle-même son propre déroulement.
+
+**C'est quoi le pattern Repository ?**
+Une couche qui isole l'accès aux données (requêtes en base) du reste de la logique métier, pour pouvoir changer la source de données sans toucher au reste du code.
+
+**C'est quoi une API idempotente ?**
+Une API où appeler plusieurs fois la même requête produit toujours le même résultat final, sans effet de bord supplémentaire à chaque répétition.
+
+**C'est quoi la pagination d'une API ?**
+Renvoyer les résultats d'une liste par petits lots (ex: 20 éléments) plutôt que tout d'un coup, pour rester rapide et léger même quand il y a beaucoup de données.
+
 ---
 
 ## Sécurité
@@ -225,6 +261,21 @@ Un schéma qui vérifie que toutes les variables nécessaires sont présentes et
 **C'est quoi le principe "fail-fast" ?**
 Vérifier les conditions bloquantes le plus tôt possible et arrêter immédiatement le traitement si l'une échoue, plutôt que de continuer un travail qui sera de toute façon annulé.
 
+**C'est quoi le principe du moindre privilège ?**
+Ne donner à chaque utilisateur, service ou composant que les droits strictement nécessaires à son fonctionnement, jamais plus.
+
+**C'est quoi l'OWASP Top 10 ?**
+Une liste de référence des 10 failles de sécurité web les plus courantes et les plus critiques (injection, mauvaise authentification, etc.), utilisée comme checklist par les développeurs.
+
+**C'est quoi une attaque par force brute, et comment s'en protéger ?**
+Essayer un grand nombre de combinaisons (mots de passe, tokens) jusqu'à trouver la bonne ; on s'en protège avec du rate limiting, un verrouillage temporaire après plusieurs échecs, et des mots de passe/tokens suffisamment longs.
+
+**Pourquoi ne jamais committer un secret (clé API, mot de passe) dans le code ?**
+Parce que l'historique Git garde une trace permanente, même si on le supprime plus tard ; les secrets doivent rester dans des variables d'environnement non versionnées.
+
+**Quelle est la différence entre authentification et autorisation ?**
+L'authentification vérifie qui est l'utilisateur (login) ; l'autorisation vérifie ce qu'il a le droit de faire une fois identifié.
+
 ---
 
 ## Base de données
@@ -255,6 +306,18 @@ Une colonne qui ne peut prendre qu'une liste fixe de valeurs (ex: un statut limi
 
 **C'est quoi une transaction SQL ?**
 Un ensemble d'opérations exécutées comme un bloc unique : soit toutes réussissent et sont validées, soit une échoue et tout est annulé, pour garantir la cohérence des données.
+
+**C'est quoi un index en base de données ?**
+Une structure qui accélère la recherche sur une colonne (comme le sommaire d'un livre), au prix d'un peu plus de place et d'un léger coût à l'écriture.
+
+**C'est quoi le problème "N+1 requêtes" ?**
+Le fait de faire une requête pour récupérer une liste, puis une requête supplémentaire par élément de cette liste pour récupérer ses données liées, au lieu de tout récupérer en une seule requête optimisée.
+
+**C'est quoi ACID ?**
+Les quatre garanties d'une transaction fiable : Atomicité (tout ou rien), Cohérence (la base reste valide), Isolation (les transactions ne se marchent pas dessus), Durabilité (une fois validée, la donnée survit à une panne).
+
+**C'est quoi une contrainte d'unicité ?**
+Une règle en base qui empêche deux lignes d'avoir la même valeur sur une colonne (ex: deux comptes avec le même email).
 
 ---
 
@@ -287,6 +350,12 @@ Un produit à prix nul ne doit jamais passer par le prestataire de paiement : il
 **Pourquoi convertir un prix en centimes avant d'appeler un prestataire de paiement ?**
 La plupart des prestataires travaillent en plus petite unité de la devise (centimes), et manipuler des entiers évite les erreurs d'arrondi liées aux nombres flottants.
 
+**C'est quoi un environnement "test" / sandbox chez un prestataire de paiement ?**
+Un mode qui simule de vrais paiements avec des cartes de test, sans mouvement d'argent réel, pour développer et tester sans risque.
+
+**Comment gérer un remboursement techniquement ?**
+On appelle l'API de remboursement du prestataire de paiement, puis on met à jour le statut de la commande en base une fois la confirmation reçue (souvent via un nouveau webhook dédié).
+
 ---
 
 ## Frontend
@@ -318,6 +387,15 @@ Un composant ou une garde de route vérifie le statut d'authentification avant d
 **C'est quoi une couche d'accès à l'API côté frontend ?**
 Un ensemble de fonctions qui centralisent tous les appels HTTP vers le backend, pour que les composants ne manipulent jamais directement le client HTTP et restent découplés du détail des routes.
 
+**C'est quoi une SPA (Single Page Application) ?**
+Une application web qui charge une seule page HTML au départ, puis met à jour le contenu dynamiquement en JavaScript sans recharger la page à chaque navigation.
+
+**C'est quoi le lazy loading ?**
+Charger une ressource (image, composant, page) seulement au moment où elle devient réellement nécessaire, plutôt que tout charger d'un coup au démarrage.
+
+**C'est quoi une mise à jour optimiste (optimistic update) ?**
+Mettre à jour l'interface immédiatement en supposant que l'action va réussir, avant même la réponse du serveur, puis annuler l'affichage si jamais elle échoue — pour donner une sensation de rapidité.
+
 ---
 
 ## Infra / Déploiement
@@ -342,3 +420,24 @@ Une base de données en mémoire très rapide, utilisée pour stocker temporaire
 
 **C'est quoi un entrypoint de conteneur, et pourquoi y lancer les migrations ?**
 Le script exécuté au démarrage d'un conteneur avant l'application elle-même ; il sert souvent à appliquer les migrations de base de données en attente, pour garantir que le schéma est à jour avant que le service ne commence à traiter du trafic.
+
+**Quelle est la différence entre une image Docker et un conteneur ?**
+L'image est le modèle figé (fichiers, dépendances, configuration) ; le conteneur est une instance en cours d'exécution de cette image, comme la différence entre une classe et un objet.
+
+**C'est quoi un registre d'images (ex: Docker Hub) ?**
+Un service qui stocke des images Docker et permet de les récupérer (`pull`) depuis n'importe quelle machine, au lieu de reconstruire l'image à chaque déploiement.
+
+**C'est quoi un volume Docker ?**
+Un espace de stockage qui existe en dehors du cycle de vie d'un conteneur, pour que les données survivent même si le conteneur est supprimé ou recréé.
+
+**Quelle est la différence entre scaling horizontal et vertical ?**
+Le scaling vertical augmente la puissance d'une seule machine (plus de CPU/RAM) ; le scaling horizontal ajoute plusieurs machines/instances qui se partagent la charge.
+
+**C'est quoi un load balancer ?**
+Un composant qui répartit le trafic entrant entre plusieurs instances d'un même service, pour équilibrer la charge et éviter qu'une seule instance soit surchargée.
+
+**C'est quoi un rollback de déploiement ?**
+Revenir à la version précédente de l'application après un déploiement problématique, généralement en redéployant l'ancienne image Docker.
+
+**C'est quoi un environnement de staging ?**
+Un environnement intermédiaire qui reproduit la production le plus fidèlement possible, utilisé pour valider une version avant sa mise en ligne réelle.
