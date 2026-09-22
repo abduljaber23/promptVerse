@@ -202,9 +202,11 @@ export function CreatePromptPage() {
 				</FormField>
 
 				<FormField label="Image de couverture (optionnel)" htmlFor="cover">
-					<label className="flex cursor-pointer items-center gap-3 rounded-box border border-dashed border-base-content/20 bg-base-100 p-4 text-sm text-base-content/60 hover:border-primary/40">
-						<Upload className="size-5" />
-						{coverImage ? coverImage.name : "Choisir une image…"}
+					<label className="flex min-w-0 cursor-pointer items-center gap-3 rounded-box border border-dashed border-base-content/20 bg-base-100 p-4 text-sm text-base-content/60 hover:border-primary/40">
+						<Upload className="size-5 shrink-0" />
+						<span className="truncate">
+							{coverImage ? coverImage.name : "Choisir une image…"}
+						</span>
 						<input
 							id="cover"
 							type="file"
@@ -219,9 +221,9 @@ export function CreatePromptPage() {
 					label={`Images de démonstration (${previewImages.length}/${MAX_PREVIEWS})`}
 					htmlFor="previews"
 				>
-					<label className="flex cursor-pointer items-center gap-3 rounded-box border border-dashed border-base-content/20 bg-base-100 p-4 text-sm text-base-content/60 hover:border-primary/40">
-						<ImagePlus className="size-5" />
-						Ajouter des images…
+					<label className="flex min-w-0 cursor-pointer items-center gap-3 rounded-box border border-dashed border-base-content/20 bg-base-100 p-4 text-sm text-base-content/60 hover:border-primary/40">
+						<ImagePlus className="size-5 shrink-0" />
+						<span className="truncate">Ajouter des images…</span>
 						<input
 							id="previews"
 							type="file"
