@@ -4,6 +4,12 @@ dev:
 migrate:
 	docker compose -f docker-compose.dev.yml exec api npm run migration:run
 
+seed:
+	docker compose -f docker-compose.dev.yml exec api npm run seed
+
+seed-reset:
+	docker compose -f docker-compose.dev.yml exec api npm run seed -- --reset
+
 logs:
 	docker compose -f docker-compose.dev.yml logs -f
 

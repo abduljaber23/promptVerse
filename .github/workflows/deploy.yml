@@ -181,7 +181,7 @@ jobs:
             docker compose -f docker-compose.prod.yml pull
 
             # L'entrypoint de l'image `api` (docker-entrypoint.sh) attend la
-            # base puis joue les migrations avant de démarrer Nest — pas besoin
+            # base puis joue les migrations avant de démarrer Nest pas besoin
             # de les rejouer manuellement ici.
             docker compose -f docker-compose.prod.yml up -d \
               --remove-orphans

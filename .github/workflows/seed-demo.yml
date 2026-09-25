@@ -1,0 +1,38 @@
+name: Seed démo (production)
+
+# Lancement manuel uniquement : onglet Actions > "Seed démo (production)" > Run workflow.
+# Ajoute les données de démo SANS rien effacer ni modifier (comptes admin
+# compris). Relançable sans risque : ce qui existe déjà est ignoré.
+# Secret requis en plus de ceux du déploiement : SEED_DEMO_PASSWORD
+# (mot de passe des comptes de démo, 8 caractères min.).
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Tape "seed" pour confirmer'
+        required: true
+
+jobs:
+  seed:
+    name: 🌱 Seed démo
+    runs-on: ubuntu-latest
+    environment: production
+    if: github.event.inputs.confirm == 'seed'
+
+    steps:
+      - name: 🌱 Lancer le seeder sur le VPS
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          SEED_DEMO_PASSWORD: ${{ secrets.SEED_DEMO_PASSWORD }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          envs: SEED_DEMO_PASSWORD
+          script: |
+            cd /opt/promptverse
+            docker compose -f docker-compose.prod.yml exec -T \
+              -e SEED_DEMO_PASSWORD="$SEED_DEMO_PASSWORD" \
+              api npm run seed:prod
