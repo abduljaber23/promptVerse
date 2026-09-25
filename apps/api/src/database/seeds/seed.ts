@@ -29,7 +29,6 @@
 import 'reflect-metadata';
 import { promises as fs } from 'fs';
 import { join } from 'path';
-import { randomUUID } from 'crypto';
 import { DataSource, EntityManager } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import slugify from 'slugify';
