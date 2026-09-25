@@ -88,6 +88,16 @@ export function CatalogPage() {
 		setParams(next);
 	};
 
+	// Changer de page ne doit PAS passer par updateFilter : celui-ci remet la
+	// pagination à zéro (next.delete("page")) à chaque changement de filtre.
+	const goToPage = (p: number) => {
+		const next = new URLSearchParams(params);
+		if (p > 1) next.set("page", String(p));
+		else next.delete("page");
+		setParams(next);
+		window.scrollTo({ top: 0, behavior: "smooth" });
+	};
+
 	const clearAll = () => setParams(new URLSearchParams());
 
 	const hasFilters = Boolean(category || aiTool || queryParam);
@@ -192,9 +202,7 @@ export function CatalogPage() {
 								page={page}
 								hasNext={hasNext}
 								isFetching={listAll.isFetching}
-								onPageChange={(p) =>
-									updateFilter("page", String(p))
-								}
+								onPageChange={goToPage}
 							/>
 						</>
 					)}
