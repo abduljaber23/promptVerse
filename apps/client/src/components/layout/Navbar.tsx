@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/common/lib/cn";
 import { useUiStore } from "@/common/store/ui.store";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { Container } from "./Container";
 import { Logo } from "./Logo";
 import { UserAvatar } from "@/components/ui/UserAvatar";

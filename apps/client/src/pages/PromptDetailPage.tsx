@@ -12,7 +12,7 @@ import { usePromptBySlug } from "@/hooks/usePrompts";
 import { useCreateCheckoutSession } from "@/hooks/usePurchases";
 import { useCatalogMaps } from "@/hooks/useCatalog";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { getApiErrorMessage, getStatus } from "@/common/lib/api-error";
 import { resolveAssetUrl } from "@/common/lib/assets";
 import { formatCount, formatPromptPrice } from "@/common/lib/format";

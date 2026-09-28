@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { PageLoader } from "@/components/ui/Spinner";
 import { Container } from "@/components/layout/Container";
 import { Alert } from "@/components/ui/Alert";

@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { AuthBootstrap } from "@/context/AuthContext";
+import { AuthBootstrap } from "@/hooks/useAuth";
 import { Toaster } from "@/components/ui/Toaster";
 import "@/common/store/ui.store"; // applique le thème persistant au chargement
 import App from "./App.tsx";

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { PlusCircle, ShoppingBag } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { useMyPrompts } from "@/hooks/usePrompts";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { formatDate, formatPrice, formatPromptPrice } from "@/common/lib/format";

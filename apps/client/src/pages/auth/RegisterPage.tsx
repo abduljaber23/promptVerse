@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { getApiErrorMessage } from "@/common/lib/api-error";
 import { toast } from "@/common/store/toast.store";
 import { AuthLayout } from "@/components/auth/AuthLayout";
