@@ -52,10 +52,10 @@ export function PromptCard({
 						{categoryName}
 					</span>
 				) : null}
-				<RatingStars
+				{/* <RatingStars
 					value={prompt.averageRating}
 					count={prompt.salesCount}
-				/>
+				/> */}
 				<div className="mt-auto flex items-center justify-between pt-2">
 					<span className="text-base font-bold text-success">
 						{formatPromptPrice(prompt.price)}

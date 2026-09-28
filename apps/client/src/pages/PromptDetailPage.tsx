@@ -124,10 +124,10 @@ export function PromptDetailPage() {
 							{prompt.title}
 						</h1>
 						<div className="flex flex-wrap items-center gap-4 text-sm text-base-content/60">
-							<RatingStars
+							{/* <RatingStars
 								value={prompt.averageRating}
 								count={prompt.salesCount}
-							/>
+							/> */}
 							<span className="inline-flex items-center gap-1">
 								<TrendingUp className="size-4" />
 								{formatCount(prompt.salesCount)} ventes
