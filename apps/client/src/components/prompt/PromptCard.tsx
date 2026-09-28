@@ -4,7 +4,7 @@ import type { Prompt } from "@/common/types";
 import { formatPromptPrice } from "@/common/lib/format";
 import { resolveAssetUrl } from "@/common/lib/assets";
 import { Thumbnail } from "@/components/ui/Thumbnail";
-import { RatingStars } from "@/components/ui/RatingStars";
+// import { RatingStars } from "@/components/ui/RatingStars";
 
 interface PromptCardProps {
 	prompt: Prompt;

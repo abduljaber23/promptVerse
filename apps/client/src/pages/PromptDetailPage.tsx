@@ -19,7 +19,7 @@ import { formatCount, formatPromptPrice } from "@/common/lib/format";
 import { toast } from "@/common/store/toast.store";
 import { Container } from "@/components/layout/Container";
 import { Thumbnail } from "@/components/ui/Thumbnail";
-import { RatingStars } from "@/components/ui/RatingStars";
+// import { RatingStars } from "@/components/ui/RatingStars";
 import { Alert } from "@/components/ui/Alert";
 import { PageLoader } from "@/components/ui/Spinner";
 import { EmptyState } from "@/components/ui/EmptyState";
