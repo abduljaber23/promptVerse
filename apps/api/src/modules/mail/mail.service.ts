@@ -32,6 +32,19 @@ export class MailService {
     }
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+  
   async sendResetPasswordTemplate(email: string, link: string) {
     try {
       await this.mailerService.sendMail({

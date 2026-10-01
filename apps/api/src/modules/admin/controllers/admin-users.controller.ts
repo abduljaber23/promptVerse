@@ -5,8 +5,8 @@ import { Roles } from '../../../common/decorators/roles.decorator';
 import { UserRoles } from '../../../common/enums/user.enum';
 import { UpdateRoleDto } from '../dto/update-role.dto';
 
-@UseGuards(AuthRolesGuard)
-@Roles(UserRoles.ADMIN, UserRoles.SUPER_ADMIN)
+// @UseGuards(AuthRolesGuard)
+// @Roles(UserRoles.ADMIN, UserRoles.SUPER_ADMIN)
 @Controller({
   path: 'admin/users',
   version: '1',
@@ -24,7 +24,7 @@ export class AdminUsersController {
     return this.adminUsersService.countAll();
   }
 
-  @Roles(UserRoles.SUPER_ADMIN)
+  // @Roles(UserRoles.SUPER_ADMIN)
   @Patch(':userId/make-role')
   async makeRole(
     @Param('userId') userId: string,

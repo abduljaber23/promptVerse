@@ -40,26 +40,47 @@ export function useAiTool(slug: string | undefined) {
 	});
 }
 
-/** Index id -> entité, pour retrouver le nom d'une catégorie / d'un outil à partir d'un prompt. */
+
+// permet de retrouver une categorie ou un outil avec son id
 export function useCatalogMaps() {
-	const categories = useCategories();
-	const aiTools = useAiTools();
 
-	const categoryById = useMemo(() => {
-		const map = new Map<string, Category>();
-		for (const c of categories.data ?? []) map.set(c.id, c);
-		return map;
-	}, [categories.data]);
+   
+    const categories = useCategories();
 
-	const aiToolById = useMemo(() => {
-		const map = new Map<string, AiTool>();
-		for (const t of aiTools.data ?? []) map.set(t.id, t);
-		return map;
-	}, [aiTools.data]);
 
-	return {
-		categoryById,
-		aiToolById,
-		isLoading: categories.isLoading || aiTools.isLoading,
-	};
+    const aiTools = useAiTools();
+
+    /
+    const categoryById = useMemo(() => {
+
+        const map = new Map<string, Category>();
+
+        // ajoute chaque categorie avec son id
+        for (const c of categories.data ?? []) map.set(c.id, c);
+
+        return map;
+
+    }, [categories.data]);
+
+    // fait une map avec les outils ia
+    const aiToolById = useMemo(() => {
+
+        const map = new Map<string, AiTool>();
+
+        // ajoute chaque outil avec son id
+        for (const t of aiTools.data ?? []) map.set(t.id, t);
+
+        return map;
+
+    }, [aiTools.data]);
+
+    return {
+
+        categoryById,
+        aiToolById,
+
+        // verifie si les données sont encore en chargement
+        isLoading: categories.isLoading || aiTools.isLoading,
+    };
 }
+
